@@ -7,6 +7,7 @@ package com.cgg.arieltrajectoryeditor;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -114,15 +115,15 @@ public class WayPointEditingPanel extends JPanel implements MouseListener, Mouse
         defaultfg = jb1.getForeground();
         add(jb1);
 
-        JButton jb2 = new JButton("Print");
-        jb2.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                printpoints();
-                repaint();
-            }
-        });
-        add(jb2);
+//        JButton jb2 = new JButton("Print");
+//        jb2.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                printpoints();
+//                repaint();
+//            }
+//        });
+//        add(jb2);
 
         JButton jb3 = new JButton("Calibrate");
         jb3.addActionListener(new ActionListener() {
@@ -379,6 +380,8 @@ public class WayPointEditingPanel extends JPanel implements MouseListener, Mouse
             speedList = sourcespeedList;
             timeList = sourcetimeList;
         }
+        g2.setStroke(defaultstroke);
+        g2.setColor(defaultcolor);
         painttrajectories(g2);
         if (!calibrationpointlist.isEmpty()) {
             for (Point p : calibrationpointlist) {
@@ -409,6 +412,10 @@ public class WayPointEditingPanel extends JPanel implements MouseListener, Mouse
 
     private void painttrajectories(Graphics2D g2) {
         Point previouspoint = null;
+        float fontsize = (float)(11/scale+0.2);
+        Font oldfont = g2.getFont();
+        Font newfont = oldfont.deriveFont(fontsize);
+        g2.setFont(newfont);
         for (Point p : pointList) {
             String s = getspeedfromp(p) + " " + gettimefromp(p);
             g2.drawString(s, 10 + p.x, p.y);
@@ -418,6 +425,7 @@ public class WayPointEditingPanel extends JPanel implements MouseListener, Mouse
             }
             previouspoint = p;
         }
+        g2.setFont(oldfont);
     }
 
     private float gettotaltime(int size) {
@@ -552,6 +560,9 @@ public class WayPointEditingPanel extends JPanel implements MouseListener, Mouse
         marinapointList = pointList;
         marinaspeedList = speedList;
         marinatimeList = timeList;
+        pointList = new ArrayList<>();
+        speedList = new ArrayList<>();
+        timeList = new ArrayList<>();
         System.out.println("Writing Marinas complete");
     }
 
