@@ -4,10 +4,8 @@
  */
 package com.cgg.arielgeometry.model.io;
 
-import com.cgg.arielgeometry.model.io.I_FileReader;
-import java.awt.FileDialog;
-import java.awt.Frame;
 import java.io.File;
+import javax.swing.JFileChooser;
 
 /**
  *
@@ -15,18 +13,22 @@ import java.io.File;
  */
 public class DirectoryReader {
 
-    String title;
     File directory;
 
     public DirectoryReader(String title) {
-        this.title = title;
-        chooseFile();
+        chooseFile(title);
     }
 
-    private void chooseFile() {
-        FileDialog fd = new FileDialog(new Frame(), title, FileDialog.LOAD);
-        fd.setVisible(true);
-        directory = new File(fd.getDirectory());
+    private void chooseFile(String title) {
+        // Choose directory
+        JFileChooser jfc = new JFileChooser();
+        jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        jfc.setDialogTitle(title);
+        jfc.showOpenDialog(jfc);
+        File id = jfc.getSelectedFile();
+        String inputdirectory = id.getAbsolutePath();
+        System.out.println("Reading from directory " + inputdirectory);
+        directory = new File(inputdirectory);
     }
 
     public void readFiles(I_FileReader dr) {
