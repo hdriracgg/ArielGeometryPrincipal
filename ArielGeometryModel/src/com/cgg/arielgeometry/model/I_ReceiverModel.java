@@ -19,4 +19,5 @@ public interface I_ReceiverModel {
     List<XYLocation> getboundingrectangle();
     void generatereceivers();
     void readfiles(I_ReceiverScanner scanner);
+    public boolean isEmpty();
 }
