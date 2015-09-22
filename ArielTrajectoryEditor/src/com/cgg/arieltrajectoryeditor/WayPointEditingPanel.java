@@ -167,7 +167,7 @@ public class WayPointEditingPanel extends JPanel implements MouseListener, Mouse
 
         final JTextField jtf1 = new JTextField();
         jtf1.setText(Integer.toString(speed));
-        jtf1.setToolTipText("Speed in cm/s");
+        jtf1.setToolTipText("Hit Enter key to confirm");
         jtf1.setPreferredSize(new Dimension(50, 27));
         jtf1.addActionListener(new ActionListener() {
             @Override
@@ -488,31 +488,6 @@ public class WayPointEditingPanel extends JPanel implements MouseListener, Mouse
         return pointList;
     }
 
-//    private void writewaypoints() {
-//        PrintStream ps;
-//        JFileChooser jfc = new JFileChooser("C:\\Users\\jgrimsdale\\Desktop");
-//        FileNameExtensionFilter filter = new FileNameExtensionFilter("csv Files", "csv");
-//        jfc.setFileFilter(filter);
-//        jfc.showSaveDialog(this);
-//        File of = jfc.getSelectedFile();
-//        String outputfilename = of.getAbsolutePath();
-//        System.out.println("Writing to file " + outputfilename);
-//        try {
-//            ps = new PrintStream(of);
-//            writewaypoints(ps);
-//        }
-//        catch (FileNotFoundException e) {
-//            System.out.println("File not found " + outputfilename);
-//        }
-//    }
-//    private void writewaypoints(PrintStream ps) {
-//        for (int i = 0; i < pointList.size(); i++) {
-//            Point realpoint = screen2real(pointList.get(i));
-//            float s = speedList.get(i);
-//            ps.printf("%d, %d, %05.3f\n", realpoint.x, realpoint.y, s);
-//        }
-//        ps.close();
-//    }
     private void writemarinatrajectories() {
         // Choose and create directory if needed
         JFileChooser jfc = new JFileChooser("C:\\Users\\jgrimsdale\\Desktop");
