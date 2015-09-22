@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+OpenIDE-Module: ArielGeometryModel
+OpenIDE-Module-Localizing-Bundle: ArielGeometryModel/Bundle.properties
+OpenIDE-Module-Specification-Version: 1.0
+
