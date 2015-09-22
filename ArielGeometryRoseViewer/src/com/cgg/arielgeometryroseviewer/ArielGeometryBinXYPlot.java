@@ -45,7 +45,7 @@ public class ArielGeometryBinXYPlot extends JPanel {
     double ymin;
     float maxoffset = 10000.0f;
     static boolean debug = false;
-    
+
     public ArielGeometryBinXYPlot(String title) {
         setToolTipText(title);
     }
@@ -100,7 +100,6 @@ public class ArielGeometryBinXYPlot extends JPanel {
         List<XYLocation> list = endCoordinateList.list;
         int imax = list.size();
         double data[][] = new double[3][imax + 1];
-//        
 
         for (XYLocation endCoordinate : list) {
             data[0][i] = endCoordinate.x;
@@ -125,7 +124,7 @@ public class ArielGeometryBinXYPlot extends JPanel {
         int i = 0;
         List<XYLocation> list = endCoordinateList.list;
         int imax = list.size();
-        double data[][] = new double[3][imax*2];
+        double data[][] = new double[3][imax * 2];
 
         for (XYLocation endCoordinate : list) {
             double x = endCoordinate.x;
@@ -133,20 +132,21 @@ public class ArielGeometryBinXYPlot extends JPanel {
             double offsetcolourbase = getoffsetcolour(x, y);
             data[0][i] = x;
             data[1][i] = y;
-            data[2][i] = offsetcolourbase;            
-            data[0][i+1] = -1.0f * x;
-            data[1][i+1] = -1.0f * y;
-            data[2][i+1] = offsetcolourbase;
+            data[2][i] = offsetcolourbase;
+            data[0][i + 1] = -1.0f * x;
+            data[1][i + 1] = -1.0f * y;
+            data[2][i + 1] = offsetcolourbase;
             if (debug) {
                 System.out.println("ArielGeometryBinXYPlot.plotxyoffsets x y : " + data[0][i] + " " + data[1][i]);
             }
-            i+=2;
+            i += 2;
         }
-        displayPlot(data, "XY offset map", "Offsets", maxoffset, true, 0, (float)xmax/40, (float)ymax/40);
+        //                                                                 change these to change the symbol size
+        displayPlot(data, "XY offset map", "Offsets", maxoffset, true, 0, (float) xmax / 100, (float) ymax / 100);
     }
-    
+
     private double getoffsetcolour(double x, double y) {
-        double offset = Math.sqrt(2*x*x + 2*y*y);
+        double offset = Math.sqrt(2 * x * x + 2 * y * y);
         return offset;
     }
 
@@ -156,7 +156,7 @@ public class ArielGeometryBinXYPlot extends JPanel {
         chartPanels[i] = chartPanel;
 
         chartPanel.setPreferredSize(new Dimension(700, 500));
-        
+
         chartPanel.setFillZoomRectangle(true);
         chartPanel.setMouseWheelEnabled(true);
         chartPanel.setMouseZoomable(true, false);
@@ -176,11 +176,11 @@ public class ArielGeometryBinXYPlot extends JPanel {
      * @return The chart.
      */
     private JFreeChart createChart(XYDataset dataset,
-                                          String pname,
-                                          float max,
-                                          boolean showscale,
-                                          float xblksize,
-                                          float yblksize) {
+                                   String pname,
+                                   float max,
+                                   boolean showscale,
+                                   float xblksize,
+                                   float yblksize) {
 
         // create the chart...
         JFreeChart chart = ChartFactory.createScatterPlot(
@@ -208,7 +208,7 @@ public class ArielGeometryBinXYPlot extends JPanel {
         XYPlot xyplot = (XYPlot) chart.getPlot();
         xyplot.setDomainPannable(true);
         xyplot.setRangePannable(true);
-        
+
         ValueAxis rangeValueAxis = xyplot.getRangeAxis();
         rangeValueAxis.setLowerBound(ymin);
         rangeValueAxis.setUpperBound(ymax);
@@ -216,7 +216,7 @@ public class ArielGeometryBinXYPlot extends JPanel {
         ValueAxis domainValueAxis = xyplot.getDomainAxis();
         domainValueAxis.setLowerBound(xmin);
         domainValueAxis.setUpperBound(xmax);
-        
+
         XYBlockRenderer renderer = new XYBlockRenderer();
 
 //        PaintScale scale = new GrayPaintScale(0.0, 10.0); 

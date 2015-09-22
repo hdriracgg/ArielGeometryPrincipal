@@ -91,7 +91,7 @@ public class ArielGeometryJFCXYPlot extends JPanel {
 
         plotreceivers();
         chartPanelsNb++;
-        
+
         if (!agm.asm.isEmpty()) {
             plotsources();
             chartPanelsNb++;
@@ -101,7 +101,7 @@ public class ArielGeometryJFCXYPlot extends JPanel {
             plotbincoverage();
             chartPanelsNb++;
         }
-        
+
         if (!agm.abm.isEmpty()) {
             plotshortoffsetcoverage();
             chartPanelsNb++;
@@ -182,11 +182,11 @@ public class ArielGeometryJFCXYPlot extends JPanel {
         String title = String.format("Coverage Map for offsets less than %.0fm", agm.shortoffset);
         plotbincoverage(agm.getshortoffsetcoverage(), title);
     }
-    
+
     void plotbincoverage() {
         plotbincoverage(agm.getbincoverage(), "Coverage Map");
     }
-    
+
     void plotbincoverage(int[][] coverage, String title) {
         ChartPanel chartPanel;
         int nonzerobins = 0;
