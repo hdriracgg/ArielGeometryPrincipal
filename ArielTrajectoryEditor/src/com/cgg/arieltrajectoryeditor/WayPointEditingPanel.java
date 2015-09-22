@@ -258,7 +258,15 @@ public class WayPointEditingPanel extends JPanel implements MouseListener, Mouse
     }
 
     private void clearpoints() {
-        pointList.clear();
+        pointList = new ArrayList<>();
+        speedList = new ArrayList<>();
+        timeList = new ArrayList<>();
+        marinapointList = null;
+        marinaspeedList = null;
+        marinatimeList = null;
+        sourcepointList = null;
+        sourcespeedList = null;
+        sourcetimeList = null;
     }
 
     private void drawpoint(Graphics2D g, int x, int y) {
@@ -412,7 +420,7 @@ public class WayPointEditingPanel extends JPanel implements MouseListener, Mouse
 
     private void painttrajectories(Graphics2D g2) {
         Point previouspoint = null;
-        float fontsize = (float)(11/scale+0.2);
+        float fontsize = (float) (11 / scale + 0.2);
         Font oldfont = g2.getFont();
         Font newfont = oldfont.deriveFont(fontsize);
         g2.setFont(newfont);
@@ -497,7 +505,6 @@ public class WayPointEditingPanel extends JPanel implements MouseListener, Mouse
 //            System.out.println("File not found " + outputfilename);
 //        }
 //    }
-
 //    private void writewaypoints(PrintStream ps) {
 //        for (int i = 0; i < pointList.size(); i++) {
 //            Point realpoint = screen2real(pointList.get(i));
@@ -506,7 +513,6 @@ public class WayPointEditingPanel extends JPanel implements MouseListener, Mouse
 //        }
 //        ps.close();
 //    }
-
     private void writemarinatrajectories() {
         // Choose and create directory if needed
         JFileChooser jfc = new JFileChooser("C:\\Users\\jgrimsdale\\Desktop");
