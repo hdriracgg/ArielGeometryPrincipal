@@ -60,6 +60,7 @@ public class ArielGeometryJFCXYPlot extends JPanel {
     static private boolean debug = false;
     // Tunables
     int maxrecvr = 250000;   // approximate max number of receiver positions to plot
+    BackGroundCalibration bgc = null;
 
     public ArielGeometryJFCXYPlot(String title, InstanceContent content) {
         setToolTipText(title);
@@ -89,8 +90,13 @@ public class ArielGeometryJFCXYPlot extends JPanel {
 
         this.agm = agm;
 
-        plotreceivers();
-        chartPanelsNb++;
+        // comment to remove background image
+        bgc = new BackGroundCalibration();
+
+        if (!agm.arm.isEmpty()) {
+            plotreceivers();
+            chartPanelsNb++;
+        }
 
         if (!agm.asm.isEmpty()) {
             plotsources();
@@ -230,19 +236,13 @@ public class ArielGeometryJFCXYPlot extends JPanel {
         ChartPanel chartPanel = new ChartPanel(chart);
         chartPanels[chartPanelsNb] = chartPanel;
 
-// Provide a scaled background image - can be commented out
-//        BufferedImage background;
-//        XYPlot plot = chart.getXYPlot();
-//        try {
-//            background = ImageIO.read(new File("C:\\Users\\jgrimsdale\\Desktop\\Moussafir A0 SURVEY map.png"));
-//        }
-//        catch (IOException e) {
-//            System.out.println("Cannot open file for background");
-//            background = null;
-//        }                                                                  //   x        y       w      h
-//        plot.getRenderer().addAnnotation(new XYDataImageAnnotation(background, 126000, 3082000, 7000, 7000) {
-//    }, Layer.BACKGROUND);
-// END Provide a scaled background image - can be commented out
+        // Provide a background image
+        if (bgc != null) {
+            XYPlot plot = chart.getXYPlot();
+            System.out.println("x=" + bgc.x + " y=" + bgc.y + " w=" + bgc.w + " h=" + bgc.h);
+            plot.getRenderer().addAnnotation(new XYDataImageAnnotation(bgc.background, bgc.x, bgc.y, bgc.w, bgc.h) {
+            }, Layer.BACKGROUND);
+        }
 
 
         chartPanel.setFillZoomRectangle(true);
@@ -440,6 +440,52 @@ public class ArielGeometryJFCXYPlot extends JPanel {
         @Override
         public void chartMouseMoved(ChartMouseEvent cme) {
             //        System.out.println("MouseMoved "+cme);
+        }
+    }
+
+    private class BackGroundCalibration {
+
+        BufferedImage background;
+        int tlx = 58;
+        int tly = 45;
+        int brx = 3890;
+        int bry = 3248;
+        int realtlx = 122864;
+        int realtly = 3083951;
+        int realbrx = 142331;
+        int realbry = 3067684;
+        float xscale;
+        float yscale;
+        int xoffset;
+        int yoffset;
+        int xorigin;
+        int yorigin;
+        int x;
+        int y;
+        int w;
+        int h;
+
+        public BackGroundCalibration() {
+            try {
+                background = ImageIO.read(new File("C:\\Users\\jgrimsdale\\Desktop\\Moussafir A0 SURVEY map.png"));
+            }
+            catch (IOException e) {
+                System.out.println("Cannot open file for background");
+                background = null;
+            }
+            int imageheight = background.getHeight();
+            int imagewidth = background.getWidth();
+            System.out.println("imh=" + imageheight + " imw=" + imagewidth);
+            xscale = (float) (realbrx - realtlx) / (float) (brx - tlx);
+            yscale = (float) (realtly - realbry) / (float) (bry - tly);
+            xoffset = tlx;
+            yoffset = tly;
+            xorigin = realtlx;
+            yorigin = realbry;
+            x = xorigin;
+            y = yorigin;
+            w = (int) (imagewidth * xscale);
+            h = (int) (imageheight * yscale);
         }
     }
 }
