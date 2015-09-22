@@ -191,4 +191,9 @@ public class ReceiverModel implements I_ReceiverModel {
     public void readfiles(I_ReceiverScanner scanner) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+
+    @Override
+    public boolean isEmpty() {
+        return false;
+    }
 }
