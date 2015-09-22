@@ -32,12 +32,17 @@ public class DirectoryReader {
     }
 
     public void readFiles(I_FileReader dr) {
-        if (directory.isFile()) {
-            dr.readaFile(directory);
+        readFiles(dr, directory);
+    }
+    
+    // Recursively read files 
+    private void readFiles(I_FileReader dr, File d) {
+        if (d.isFile()) {
+            dr.readaFile(d);
         }
-        if (directory.isDirectory()) {
-            for (File fileEntry : directory.listFiles()) {
-                dr.readaFile(fileEntry);
+        if (d.isDirectory()) {
+            for (File fileEntry : d.listFiles()) {
+                readFiles(dr, fileEntry);
             }
         }
     }
