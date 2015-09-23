@@ -475,13 +475,17 @@ public class ArielGeometryJFCXYPlot extends JPanel {
             }
             int imageheight = background.getHeight();
             int imagewidth = background.getWidth();
-            System.out.println("imh=" + imageheight + " imw=" + imagewidth);
+//            System.out.println("imh=" + imageheight + " imw=" + imagewidth);
             xscale = (float) (realbrx - realtlx) / (float) (brx - tlx);
             yscale = (float) (realtly - realbry) / (float) (bry - tly);
+//            System.out.println("xscale="+xscale+" yscale="+yscale);
             xoffset = tlx;
             yoffset = tly;
-            xorigin = realtlx;
-            yorigin = realbry;
+// The code below gives slightly bad result to be checked
+//            xorigin = realtlx-(int)(tlx*xscale);
+//            yorigin = realbry-(int)(tly*yscale);
+            xorigin = realtlx - 298;
+            yorigin = realbry - 311;
             x = xorigin;
             y = yorigin;
             w = (int) (imagewidth * xscale);

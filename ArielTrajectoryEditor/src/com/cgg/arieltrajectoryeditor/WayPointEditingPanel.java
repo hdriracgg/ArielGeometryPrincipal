@@ -94,7 +94,7 @@ public class WayPointEditingPanel extends JPanel implements MouseListener, Mouse
         addMouseListener(this);
         addMouseWheelListener(this);
 
-        widestroke = new BasicStroke(5.0f);
+        widestroke = new BasicStroke(2.5f);
         try {
             background = ImageIO.read(new File("C:\\Users\\jgrimsdale\\Desktop\\Moussafir A0 SURVEY map.png"));
         }
