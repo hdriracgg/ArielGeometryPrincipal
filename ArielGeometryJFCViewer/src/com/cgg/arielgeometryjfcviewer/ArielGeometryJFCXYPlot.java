@@ -90,8 +90,9 @@ public class ArielGeometryJFCXYPlot extends JPanel {
 
         this.agm = agm;
 
-        // comment to remove background image
-        bgc = new BackGroundCalibration();
+        if (agm.backgroundimagedisplayed) {
+            bgc = new BackGroundCalibration();
+        }
 
         if (!agm.arm.isEmpty()) {
             plotreceivers();

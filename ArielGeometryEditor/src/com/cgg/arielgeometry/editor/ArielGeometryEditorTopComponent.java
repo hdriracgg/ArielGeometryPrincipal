@@ -141,6 +141,7 @@ public final class ArielGeometryEditorTopComponent extends TopComponent {
         jLabel25 = new javax.swing.JLabel();
         jLabel27 = new javax.swing.JLabel();
         shortoffset = new javax.swing.JTextField();
+        backgroundImage = new javax.swing.JCheckBox();
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel26, org.openide.util.NbBundle.getMessage(ArielGeometryEditorTopComponent.class, "ArielGeometryEditorTopComponent.jLabel26.text")); // NOI18N
 
@@ -351,14 +352,19 @@ public final class ArielGeometryEditorTopComponent extends TopComponent {
 
         shortoffset.setText(org.openide.util.NbBundle.getMessage(ArielGeometryEditorTopComponent.class, "ArielGeometryEditorTopComponent.shortoffset.text")); // NOI18N
 
+        backgroundImage.setSelected(true);
+        org.openide.awt.Mnemonics.setLocalizedText(backgroundImage, org.openide.util.NbBundle.getMessage(ArielGeometryEditorTopComponent.class, "ArielGeometryEditorTopComponent.backgroundImage.text")); // NOI18N
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel27)
-                .addContainerGap(458, Short.MAX_VALUE))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel27)
+                    .addComponent(backgroundImage))
+                .addContainerGap(441, Short.MAX_VALUE))
             .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jPanel1Layout.createSequentialGroup()
                     .addContainerGap()
@@ -375,7 +381,7 @@ public final class ArielGeometryEditorTopComponent extends TopComponent {
                                     .addComponent(loadfile)
                                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                     .addComponent(DefaultButton)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 8, Short.MAX_VALUE)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 46, Short.MAX_VALUE)
                                     .addComponent(printtoggle))
                                 .addGroup(jPanel1Layout.createSequentialGroup()
                                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -472,7 +478,9 @@ public final class ArielGeometryEditorTopComponent extends TopComponent {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(329, 329, 329)
                 .addComponent(jLabel27)
-                .addContainerGap(434, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(backgroundImage)
+                .addContainerGap(404, Short.MAX_VALUE))
             .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jPanel1Layout.createSequentialGroup()
                     .addContainerGap()
@@ -667,6 +675,7 @@ public final class ArielGeometryEditorTopComponent extends TopComponent {
     private javax.swing.JButton MovingButton;
     private javax.swing.JButton SpecialButton;
     private javax.swing.JButton StandardButton;
+    private javax.swing.JCheckBox backgroundImage;
     private javax.swing.JTextField bxs;
     private javax.swing.JTextField bys;
     private javax.swing.JTextField davecov;
@@ -772,6 +781,7 @@ public final class ArielGeometryEditorTopComponent extends TopComponent {
         agm.rs = new Integer(rs.getText());
         agm.rss = new Float(rss.getText());
         agm.shortoffset = new Float(shortoffset.getText());
+        agm.backgroundimagedisplayed = backgroundImage.isSelected();
     }
 
     private void updatecalculatedvalues() {
