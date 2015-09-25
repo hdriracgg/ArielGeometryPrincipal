@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+OpenIDE-Module: com.cgg.netcdfwrapper
+OpenIDE-Module-Localizing-Bundle: com/cgg/netcdfwrapper/Bundle.properties
+OpenIDE-Module-Specification-Version: 1.0
+
