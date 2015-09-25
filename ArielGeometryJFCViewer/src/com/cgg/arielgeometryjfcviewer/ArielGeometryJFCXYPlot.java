@@ -16,7 +16,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import javax.imageio.ImageIO;
+import javax.swing.JFileChooser;
 import javax.swing.JPanel;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartMouseEvent;
 import org.jfree.chart.ChartMouseListener;
@@ -472,7 +474,7 @@ public class ArielGeometryJFCXYPlot extends JPanel {
             }
             catch (IOException e) {
                 System.out.println("Cannot open file for background");
-                background = null;
+                background = getbackground();
             }
             int imageheight = background.getHeight();
             int imagewidth = background.getWidth();
@@ -491,6 +493,24 @@ public class ArielGeometryJFCXYPlot extends JPanel {
             y = yorigin;
             w = (int) (imagewidth * xscale);
             h = (int) (imageheight * yscale);
+        }
+
+        private BufferedImage getbackground() {
+            JFileChooser jfc = new JFileChooser();
+            jfc.setDialogTitle("Select background image png file");
+            jfc.setToolTipText("Select background image png file");
+            FileNameExtensionFilter filter = new FileNameExtensionFilter("png Files", "png");
+            jfc.setFileFilter(filter);
+            jfc.showOpenDialog(jfc);
+            File file = jfc.getSelectedFile();
+            BufferedImage bi = null;
+            try {
+                bi = ImageIO.read(file);
+            }
+            catch (IOException e) {
+                System.out.println("Cannot open file for background " + file.getAbsolutePath());
+            }
+            return bi;
         }
     }
 }
