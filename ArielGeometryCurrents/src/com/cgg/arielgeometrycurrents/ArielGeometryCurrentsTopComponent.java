@@ -72,27 +72,19 @@ public final class ArielGeometryCurrentsTopComponent extends TopComponent {
     @Override
     public void componentOpened() {
         System.out.println("ArielGeometryCurrents opened");
-
-    }
-
-    @Override
-    protected void componentShowing() {
-        super.componentShowing();
-        System.out.println("ArielGeometryCurrents Showing");
         cep = new CurrentEditorPanel();
         JScrollPane scrollPane = new JScrollPane(cep);
         this.setLayout(new BorderLayout());
         this.add(scrollPane);
         //        result = org.openide.util.Utilities.actionsGlobalContext().lookupResult(AbstractGeometryModel.class);
         //        result.addLookupListener(this);
-        //        if(debug) System.out.println("ArielGeometryJFCViewerTopComponent.componentOpened");
-        try {
+    }
 
-            cep.dowork();
-        }
-        catch (IOException | InvalidRangeException ex) {
-            Exceptions.printStackTrace(ex);
-        }
+    @Override
+    protected void componentShowing() {
+        super.componentShowing();
+        System.out.println("ArielGeometryCurrents Showing");
+
     }
 
     @Override

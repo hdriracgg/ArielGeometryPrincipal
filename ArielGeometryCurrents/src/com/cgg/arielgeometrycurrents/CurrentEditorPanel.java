@@ -75,6 +75,8 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
     double deg2cm = (Math.PI * 637131500.0) / 180.0;
     int previoustimeindex = -1; // Time index of previous lookup
     float[][][][] previous4darray;
+    
+    
     BufferedImage background;
     boolean firstTime = true;
     boolean debug = false;
@@ -103,6 +105,7 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
     List<Point> calibrationpointlist;
     JDialog calibrationdialog;
     int speed = 25;
+    int time = 5000;
     // Marina swarm paramters
     int nbNodePerGroup = 4;
     int nbNodeperLine = 4;
@@ -188,20 +191,20 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
         });
         add(jb5);
 
-        JLabel jl1 = new JLabel("Speed in cm/s = ");
+        JLabel jl1 = new JLabel("Time in s = ");
         jl1.setOpaque(true);
         jl1.setBackground(Color.LIGHT_GRAY);
         add(jl1);
 
         final JTextField jtf1 = new JTextField();
-        jtf1.setText(Integer.toString(speed));
+        jtf1.setText(Integer.toString(time));
         jtf1.setToolTipText("Hit Enter key to confirm");
         jtf1.setPreferredSize(new Dimension(50, 27));
         jtf1.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                speed = Integer.parseInt(jtf1.getText());
-                System.out.println("Speed changed to " + speed + " cm/s");
+                time = Integer.parseInt(jtf1.getText());
+                System.out.println("Start time changed to " + time + " s");
             }
         });
         add(jtf1);
@@ -243,6 +246,7 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
     }
 
     private void addpoint(int x, int y) {
+        System.out.println("New real point ="+screen2real(screen2transformed(x, y)));
         pointList.add(screen2transformed(x, y));
         speedList.add((float) speed);
         timeList.add(gettotaltime(pointList.size()));
