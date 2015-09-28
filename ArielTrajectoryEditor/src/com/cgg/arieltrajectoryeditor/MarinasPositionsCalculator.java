@@ -11,6 +11,7 @@ import java.util.Map;
  * @author hdrira
  */
 public class MarinasPositionsCalculator {
+
     
     /**
      * Standard distance between marinas in meters 
@@ -27,11 +28,15 @@ public class MarinasPositionsCalculator {
      */
     public static int NODE_PER_GROUP = 4;
     
-    //
     /**
      * Standard number of nodes per line
      */
     public static int NODE_PER_LINE = 4;
+    
+    /**
+     * Standard Initial Time
+     */
+    public static long INITIAL_Time = 0;
             
     // Trajectory points
     private List<Point> trajectoryPoints;
@@ -54,6 +59,9 @@ public class MarinasPositionsCalculator {
     // Distance between marinas
     private int marinasDistance;
     
+    // Initial Time
+    private long initialTime;
+    
     /**
      * Calculate the marinas positions 
      * DISTANCE_BETWEEN_MARINAS = 125 
@@ -71,6 +79,7 @@ public class MarinasPositionsCalculator {
         this.nbNodeperLine = NODE_PER_LINE;
         this.stepDuration = STEP_DURATION;
         this.marinasDistance = DISTANCE_BETWEEN_MARINAS;
+        this.initialTime = INITIAL_Time;
     }
     
     /**
@@ -82,8 +91,9 @@ public class MarinasPositionsCalculator {
      * @param nbNodeperLine Number of nodes per line
      * @param stepDuration Duration between each step
      * @param marinasDistance Distance between marinas
+     * @param  initialTime Initial Time
      */
-    public MarinasPositionsCalculator(List<Point> trajectoryPoints, List<Float> trajectorySpeeds, int nbNodePerGroup, int nbNodeperLine, int stepDuration, int marinasDistance) {
+    public MarinasPositionsCalculator(List<Point> trajectoryPoints, List<Float> trajectorySpeeds, int nbNodePerGroup, int nbNodeperLine, int stepDuration, int marinasDistance, long initialTime) {
         this.trajectoryPoints = trajectoryPoints;
         this.trajectorySpeeds = trajectorySpeeds;
         this.marinasPoints = new ArrayList<>();
@@ -91,6 +101,7 @@ public class MarinasPositionsCalculator {
         this.nbNodeperLine = nbNodeperLine;
         this.stepDuration = stepDuration;
         this.marinasDistance = marinasDistance;
+        this.initialTime = initialTime;
     }
     
     /**
@@ -166,7 +177,7 @@ public class MarinasPositionsCalculator {
                     for(int j=0; j<getNbMarinas(); j++){
                         Node firstStepNode = firstPoints.get(j);
                         Point newPoint = new Point(firstStepNode.getCoodinates().x + xToAdd.intValue() ,firstStepNode.getCoodinates().y + yToAdd.intValue());
-                        Node newNode = new Node(newPoint, firstStepNode.getTime() + (stepDuration * p));
+                        Node newNode = new Node(newPoint, initialTime + firstStepNode.getTime() + (stepDuration * p));
                         
                         newMarinasPositions.put(j, newNode);
                     }
@@ -226,8 +237,9 @@ public class MarinasPositionsCalculator {
         int nbNodeperLine = 4;
         int stepDuration = 10;
         int marinasDistance = 125;
+        long initialTime = 120;
         
-        MarinasPositionsCalculator marinasPositionsCalculator = new MarinasPositionsCalculator(trajectoryPoints, trajectorySpeeds, nbNodePerGroup, nbNodeperLine, stepDuration, marinasDistance);
+        MarinasPositionsCalculator marinasPositionsCalculator = new MarinasPositionsCalculator(trajectoryPoints, trajectorySpeeds, nbNodePerGroup, nbNodeperLine, stepDuration, marinasDistance, initialTime);
         
         List<Map<Integer, Node>> marinasPositions = marinasPositionsCalculator.getMarinasPoints();
         

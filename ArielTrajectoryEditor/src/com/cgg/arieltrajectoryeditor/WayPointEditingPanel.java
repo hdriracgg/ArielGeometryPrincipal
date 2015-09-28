@@ -75,6 +75,7 @@ public class WayPointEditingPanel extends JPanel implements MouseListener, Mouse
     List<Point> calibrationpointlist;
     JDialog calibrationdialog;
     int speed = 25;
+    long starttime = 0;
     // Marina swarm paramters
     int nbNodePerGroup = 4;
     int nbNodeperLine = 4;
@@ -160,23 +161,41 @@ public class WayPointEditingPanel extends JPanel implements MouseListener, Mouse
         });
         add(jb5);
 
-        JLabel jl1 = new JLabel("Speed in cm/s = ");
+        JLabel jl1 = new JLabel("Start Time = ");
         jl1.setOpaque(true);
         jl1.setBackground(Color.LIGHT_GRAY);
         add(jl1);
 
         final JTextField jtf1 = new JTextField();
-        jtf1.setText(Integer.toString(speed));
+        jtf1.setText(Long.toString(starttime));
         jtf1.setToolTipText("Hit Enter key to confirm");
         jtf1.setPreferredSize(new Dimension(50, 27));
         jtf1.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                speed = Integer.parseInt(jtf1.getText());
-                System.out.println("Speed changed to " + speed + " cm/s");
+                starttime = Long.parseLong(jtf1.getText());
+                System.out.println("Start time changed to " + starttime + " s");
             }
         });
         add(jtf1);
+
+        JLabel jl2 = new JLabel("Speed in cm/s = ");
+        jl2.setOpaque(true);
+        jl2.setBackground(Color.LIGHT_GRAY);
+        add(jl2);
+
+        final JTextField jtf2 = new JTextField();
+        jtf2.setText(Integer.toString(speed));
+        jtf2.setToolTipText("Hit Enter key to confirm");
+        jtf2.setPreferredSize(new Dimension(50, 27));
+        jtf2.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                speed = Integer.parseInt(jtf2.getText());
+                System.out.println("Speed changed to " + speed + " cm/s");
+            }
+        });
+        add(jtf2);
 
         pointList = new ArrayList<>();
         speedList = new ArrayList<>();
@@ -530,7 +549,7 @@ public class WayPointEditingPanel extends JPanel implements MouseListener, Mouse
 
         // Run the interpolation
         MarinasPositionsCalculator mpc = new MarinasPositionsCalculator(realpointList,
-                speedList, nbNodePerGroup, nbNodeperLine, stepDuration, marinasDistance);
+                speedList, nbNodePerGroup, nbNodeperLine, stepDuration, marinasDistance, starttime);
         List<Map<Integer, Node>> lmin = mpc.getMarinasPoints();
 
         // Output each Marina to a separate file in chosen directory
@@ -584,7 +603,7 @@ public class WayPointEditingPanel extends JPanel implements MouseListener, Mouse
 
         // Run the interpolation
         MarinasPositionsCalculator mpc = new MarinasPositionsCalculator(realpointList,
-                speedList, 1, 1, stepDuration, marinasDistance);
+                speedList, 1, 1, stepDuration, marinasDistance, starttime);
         List<Map<Integer, Node>> lmin = mpc.getMarinasPoints();
 
         // Output each shot to a separate file in chosen directory
@@ -614,7 +633,7 @@ public class WayPointEditingPanel extends JPanel implements MouseListener, Mouse
 
         // Run the interpolation
         MarinasPositionsCalculator mpc = new MarinasPositionsCalculator(realpointList,
-                speedList, nbNodePerGroup, nbNodeperLine, stepDuration, marinasDistance);
+                speedList, nbNodePerGroup, nbNodeperLine, stepDuration, marinasDistance, starttime);
         List<Map<Integer, Node>> lmin = mpc.getMarinasPoints();
 
         // Print results
