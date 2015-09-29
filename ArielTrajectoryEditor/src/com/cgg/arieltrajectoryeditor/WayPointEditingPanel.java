@@ -459,8 +459,8 @@ public class WayPointEditingPanel extends JPanel implements MouseListener, Mouse
         float t = 0.0f;
         int idx = size - 1;
         if (idx > 0) {
-            Point thispoint = pointList.get(idx);
-            Point previouspoint = pointList.get(idx - 1);
+            Point thispoint = screen2real(pointList.get(idx));
+            Point previouspoint = screen2real(pointList.get(idx - 1));
             double x2 = Math.pow(thispoint.x - previouspoint.x, 2.0);
             double y2 = Math.pow(thispoint.y - previouspoint.y, 2.0);
             float distance = (float) Math.sqrt(x2 + y2);
@@ -474,7 +474,12 @@ public class WayPointEditingPanel extends JPanel implements MouseListener, Mouse
 
     private String gettimefromp(Point p) {
         int idx = pointList.indexOf(p);
-        return String.format("%.0fs", timeList.get(idx));
+        float flt = timeList.get(idx);
+        int timeinsecs = (int)flt;
+        int hours = timeinsecs/3600;
+        int minutes = (timeinsecs%3600)/60;
+        int secs = timeinsecs%60;
+        return String.format("%d:%d:%d", hours, minutes, secs);
     }
 
     private String getspeedfromp(Point p) {

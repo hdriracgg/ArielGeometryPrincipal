@@ -163,7 +163,7 @@ public class MarinasPositionsCalculator {
                 
                 //Calculate the number of transitional point between each segment
                 double distance = Math.sqrt(Math.pow((p2.getX() - p1.getX()), 2) + Math.pow((p2.getY() - p1.getY()), 2));
-                double step_distance = (stepDuration * speed)/1000;
+                double step_distance = (stepDuration * speed)/100;
                 Double xToAddByStep = step_distance * Math.cos(angle);
                 Double yToAddByStep = step_distance * Math.sin(angle);
                 
