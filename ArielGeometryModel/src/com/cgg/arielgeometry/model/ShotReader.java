@@ -56,13 +56,36 @@ public class ShotReader {
                 filesread, locationsread);
     }
     
+    
     /**
      * Read a file. Can be called by a call back in DirectoryReader
-     *
+     * Uses shot time for shotid
      *
      * @param file
      */
     public void readFile(File file) {
+        System.out.printf("ShotReader:readFile reading filename = %s\n", file.getName());
+        shotScanner.setFile(file);
+        while (shotScanner.hasNextShot()) {
+            com.cgg.arielgeometry.model.types.Shot shot = shotScanner.getShot();
+            XYLocation xylocation = shot.xylocation;
+            long time = shot.id;
+            if (debug) {
+                System.out.println("time = " + time + " " + xylocation.x + " " + xylocation.y);
+            }
+            shotlocationmap.put((int)time, xylocation);
+            locationsread++;
+        }
+        filesread++;
+    }
+    
+    /**
+     * Read a file. Can be called by a call back in DirectoryReader
+     * To be used if shot times are not available
+     *
+     * @param file
+     */
+    public void readFilenotime(File file) {
         System.out.printf("ShotReader:readFile reading filename = %s\n", file.getName());
         shotScanner.setFile(file);
         shotid = -1;

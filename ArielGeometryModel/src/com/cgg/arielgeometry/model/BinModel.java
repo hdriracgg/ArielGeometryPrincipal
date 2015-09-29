@@ -42,7 +42,7 @@ public class BinModel implements I_BinModel {
         coverage = new int[agm.binsx][agm.binsy];
         shortoffsetcoverage = new int[agm.binsx][agm.binsy];
         int shotswithoutreceivers = 0;
-        for (int shot = 0; shot < asm.getsize(); shot++) {
+        for(Integer shot : asm.getshotnumberset()) {
             XYLocation shotlocation = asm.getshotlocation(shot);
             List<XYLocation> receiverlocationlist = arm.getreceiverlocationspershot(shot);
             if (receiverlocationlist == null) {

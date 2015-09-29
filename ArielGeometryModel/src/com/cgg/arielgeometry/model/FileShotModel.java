@@ -33,11 +33,19 @@ public class FileShotModel extends ShotModel implements I_ShotModel {
         updateagmparameters();
     }
 
-    void updatesources() {
+    void oldupdatesources() {
         shotlocationmap = asr.getshotlocationmap();
-        for(int i=0; i<shotlocationmap.size(); i++) {
+        for (int i = 0; i < shotlocationmap.size(); i++) {
             XYLocation xyl = shotlocationmap.get(i);
             addshotlocation(i, xyl.x, xyl.y);
+        }
+    }
+
+    void updatesources() {
+        shotlocationmap = asr.getshotlocationmap();
+        for (Integer shot : shotlocationmap.keySet()) {
+            XYLocation xyl = shotlocationmap.get(shot);
+            addshotlocation(shot, xyl.x, xyl.y);
         }
     }
 }

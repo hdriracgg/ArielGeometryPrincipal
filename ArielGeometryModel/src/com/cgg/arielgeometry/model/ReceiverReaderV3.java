@@ -90,9 +90,9 @@ public class ReceiverReaderV3 {
             }
         });
         updatereceiverlocations();
-        System.out.printf("ReceiverReader:readreceivers read %d files and %d locations %d averagelocations\n",
-                filesread, locationsread, averagelocations);
         agm.rnbn = nodenames.size();
+        System.out.printf("ReceiverReader:readreceivers read %d files and %d locations %d averagelocations %d nodes\n",
+                filesread, locationsread, averagelocations, nodenames.size());
     }
 
     /**
@@ -124,6 +124,7 @@ public class ReceiverReaderV3 {
             if (debug) {
                 System.out.println(name + " " + receiver.id + " " + xyzlocation.x + " " + xyzlocation.y);
             }
+            //           filename, time, x, y
             updatetalmap(name, receiver.id, xyzlocation.x, xyzlocation.y);
             locationsread++;
         }
@@ -162,10 +163,30 @@ public class ReceiverReaderV3 {
      */
     private void updatereceiverlocations() {
         for (String name : timeandlocationmap.keySet()) {
-            updateanode(timeandlocationmap.get(name));
+            updateanodewithoutinterpolation(timeandlocationmap.get(name));
         }
         // remove reference so it can be garbage collected
         timeandlocationmap = null;
+    }
+
+    /**
+     * Called by updatereceiverlocations. This version does not interpolate.
+     * Usually because we don't know if there will be missing shot points.
+     *
+     * @param tall Time and location Set
+     */
+    private void updateanodewithoutinterpolation(TreeSet<TimeandLocation> tall) {
+        for (TimeandLocation tal : tall) {
+            int time = tal.time;
+            // get the receiverlocation map for this spid
+            List<XYLocation> xyll = receiverlocationmap.get(time);
+            // if it doesn't exist yet, then create a new one and put it in the receiever location map
+            if (xyll == null) {
+                xyll = new ArrayList<>();
+                receiverlocationmap.put(time, xyll);
+            }
+            xyll.add(tal.xylocation);
+        }
     }
 
     /**
@@ -175,7 +196,7 @@ public class ReceiverReaderV3 {
      *
      * @param tall Time and location Set
      */
-    private void updateanode(TreeSet<TimeandLocation> tall) {
+    private void updateanodewithinterpolation(TreeSet<TimeandLocation> tall) {
 
         // will just be used for comparisons
         TimeandLocation comparisonelement = new TimeandLocation(0, null);
@@ -226,11 +247,11 @@ public class ReceiverReaderV3 {
 
     /**
      * Interpolate between two locations before and after desired time
-     * 
+     *
      * @param thistime desired time
      * @param lowertal time and location of sample immediately before
      * @param uppertal time and location of sample immediately after
-     * @return 
+     * @return
      */
     private XYLocation calculatelocation(int thistime, TimeandLocation lowertal, TimeandLocation uppertal) {
 
@@ -253,13 +274,13 @@ public class ReceiverReaderV3 {
 
     /**
      * Interpolate between two locations for a desired time
-     * 
+     *
      * @param a time before
      * @param b time desired
      * @param c time after
      * @param lower Location at time before
      * @param higher Location at time after
-     * @return 
+     * @return
      */
     private XYLocation interpolatelocation(int a, int b, int c, XYLocation lower, XYLocation higher) {
         double ratio;
@@ -289,7 +310,7 @@ public class ReceiverReaderV3 {
 
     /**
      * Convert a spid back to time
-     * 
+     *
      * @param spid spid to be converted
      * @return unix time
      */

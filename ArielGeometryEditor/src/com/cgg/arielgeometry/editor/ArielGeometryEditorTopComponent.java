@@ -624,7 +624,7 @@ public final class ArielGeometryEditorTopComponent extends TopComponent {
 
     private void loadfileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadfileActionPerformed
         //        agm = new GeometryModel("ReceiverModel", "EmptyShotModel");
-        if(agm != null) {
+        if (agm != null) {
             content.remove(agm);
         }
         agm = new GeometryModel("FileReceiverModel", "FileShotModel");
@@ -669,7 +669,6 @@ public final class ArielGeometryEditorTopComponent extends TopComponent {
     private void rilsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rilsActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_rilsActionPerformed
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton DefaultButton;
     private javax.swing.JButton MovingButton;
