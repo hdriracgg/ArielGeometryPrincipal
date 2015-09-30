@@ -479,7 +479,7 @@ public class WayPointEditingPanel extends JPanel implements MouseListener, Mouse
         int hours = timeinsecs/3600;
         int minutes = (timeinsecs%3600)/60;
         int secs = timeinsecs%60;
-        return String.format("%d:%d:%d", hours, minutes, secs);
+        return String.format("%d:%d:%d %ds", hours, minutes, secs, timeinsecs);
     }
 
     private String getspeedfromp(Point p) {
