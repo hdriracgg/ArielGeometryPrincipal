@@ -75,6 +75,8 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
     Variable vgrid3;    // contains grid node locations
     double cm2deg = 180.0 / (Math.PI * 637131500.0);
     double deg2cm = (Math.PI * 637131500.0) / 180.0;
+    double m2deg = 180.0 / (Math.PI * 6371315.0);
+    double deg2m = (Math.PI * 6371315.0) / 180.0;
     int previoustimeindex = -1; // Time index of previous lookup
     float[][][][] previous4darray;
     BufferedImage background;
@@ -118,12 +120,21 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
     Color defaultfg;
     Color defaultbg;
     Stroke widestroke;
+    Point surveyB;
+    Point surveyR;
+    Point surveyT;
+    Point surveyL;
 
     public CurrentEditorPanel() {
         setBackground(Color.white);
         addMouseMotionListener(this);
         addMouseListener(this);
         addMouseWheelListener(this);
+
+        surveyB = new Point(132165, 3069553);
+        surveyR = new Point(137962, 3075628);
+        surveyT = new Point(132186, 3081153);
+        surveyL = new Point(126384, 3075084);
 
         widestroke = new BasicStroke(2.5f);
         try {
@@ -251,10 +262,16 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
     }
 
     private void addpoint(int x, int y) {
-        System.out.println("New real point =" + screen2real(screen2transformed(x, y)));
+        System.out.println("New real point =" + transformed2real(screen2transformed(x, y)));
+        try {
+            dowork();
+        }
+        catch (IOException | InvalidRangeException ex) {
+            Exceptions.printStackTrace(ex);
+        }
         pointList.add(screen2transformed(x, y));
-        speedList.add((float) speed);
-        timeList.add(gettotaltime(pointList.size()));
+//        speedList.add((float) speed);
+//        timeList.add(gettotaltime(pointList.size()));
     }
 
     private void recalculatetimes() {
@@ -376,6 +393,12 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
         else {
             if (e.getButton() == MouseEvent.BUTTON1) {
                 addpoint(e.getX(), e.getY());
+                try {
+                    buildtrajectory(e.getX(), e.getY());
+                }
+                catch (IOException | InvalidRangeException ex) {
+                    Exceptions.printStackTrace(ex);
+                }
             }
             if (e.getButton() == MouseEvent.BUTTON3) {
                 removepoint(e.getX(), e.getY());
@@ -462,11 +485,11 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
         Font newfont = oldfont.deriveFont(fontsize);
         g2.setFont(newfont);
         for (Point p : pointList) {
-            String s = getspeedfromp(p) + " " + gettimefromp(p);
-            g2.drawString(s, 10 + p.x, p.y);
+//            String s = getspeedfromp(p) + " " + gettimefromp(p);
+//            g2.drawString(s, 10 + p.x, p.y);
             drawpoint(g2, p.x, p.y);
             if (previouspoint != null) {
-                drawline(g2, p, previouspoint);
+//                drawline(g2, p, previouspoint);
             }
             previouspoint = p;
         }
@@ -504,7 +527,7 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
         return new Point((int) ((x / scale) - itlx), (int) ((y / scale) - itly));
     }
 
-    private Point screen2real(Point p) {
+    private Point transformed2real(Point p) {
         int x = xorigin + (int) (xscale * (p.x - xoffset));
         int y = yorigin - (int) (yscale * (p.y - yoffset));
         return new Point(x, y);
@@ -519,7 +542,7 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
         }
         if (!calibrationpointlist.isEmpty()) {
             for (Point p : pointList) {
-                System.out.println("Real point = " + screen2real(p));
+                System.out.println("Real point = " + transformed2real(p));
             }
         }
         return pointList;
@@ -557,7 +580,7 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
         // Prepare list of real points
         List<Point> realpointList = new ArrayList<>();
         for (Point p : pointList) {
-            realpointList.add(screen2real(p));
+            realpointList.add(transformed2real(p));
         }
 
         // Test interpolation
@@ -616,7 +639,7 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
         // Prepare list of real points
         List<Point> realpointList = new ArrayList<>();
         for (Point p : pointList) {
-            realpointList.add(screen2real(p));
+            realpointList.add(transformed2real(p));
         }
 
         // Run the interpolation
@@ -645,7 +668,7 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
         // Prepare list of real points
         List<Point> realpointList = new ArrayList<>();
         for (Point p : pointList) {
-            realpointList.add(screen2real(p));
+            realpointList.add(transformed2real(p));
         }
 
         // Run the interpolation
@@ -724,6 +747,43 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
         defaultcalibration = false;
     }
 
+    double x2lon(int x) {
+        return x * m2deg + 34.4d;
+    }
+
+    double y2lat(int y) {
+        return y * m2deg - 0.3d;
+    }
+
+    List<Point> buildtrajectory(int x, int y) throws IOException, InvalidRangeException {
+        Point p = transformed2real(screen2transformed(x, y));
+        int startx = p.x;
+        int starty = p.y;
+        List<Point> result = new ArrayList<>();
+        double startlon = x2lon(startx);
+        double startlat = y2lat(starty);
+        result.add(new Point(startx, starty));
+        float previouslon = (float) startlon;
+        float previouslat = (float) startlat;
+        int previousx = startx;
+        int previousy = starty;
+        float timestep = 3600.0f;
+        for (int i = 0; i < 5; i++) {
+            System.out.println("previouslon="+previouslon+" previouslat="+previouslat);
+            float[] current = getvv(previouslon, previouslat, 10000.0f, 50.0f);
+            System.out.println("Current = "+current[0]+","+current[1]);
+            int nextx = previousx + (int) (current[0] * timestep / 100.0f);
+            int nexty = previousy + (int) (current[1] * timestep / 100.0f);
+            result.add(new Point(nextx, nexty));
+            previousx = nextx;
+            previousy = nexty;
+            previouslon = (float) x2lon(nextx);
+            previouslat = (float) y2lat(nexty);
+            System.out.println("nextx="+nextx+" nexty="+nexty);
+        }
+        return result;
+    }
+
     void dowork() throws IOException, InvalidRangeException {
 //        JFileChooser jfc = new JFileChooser();
 //        jfc.showOpenDialog(jfc);
@@ -770,22 +830,28 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
 
         // outlev
         deptharray = get1dint(outlev);
-//        for (int i = 0; i < deptharray.length; i++) {
-//            System.out.println("depth " + i + " =" + deptharray[i]);
-//        }
+        for (int i = 0; i < deptharray.length; i++) {
+            System.out.println("depth " + i + " =" + deptharray[i]);
+        }
 
         // time
         timearray = get1dfloat(time);
-//        for (int i = 0; i < timearray.length; i++) {
-//            System.out.println("time " + i + " =" + timearray[i]);
-//        }
+        for (int i = 0; i < timearray.length; i++) {
+            System.out.println("time " + i + " =" + timearray[i]);
+        }
 
         // store vtot dimension of lon and lat
         int[] vtotshape = vtot.getShape();
         nxval = vtotshape[1];
         nyval = vtotshape[2];
 
-//        testll2xy();
+        testll2xy();
+
+        System.out.println("SurveyT=" + x2lon(surveyT.x) + "," + y2lat(surveyT.y));
+        System.out.println("SurveyB=" + x2lon(surveyB.x) + "," + y2lat(surveyB.y));
+        System.out.println("SurveyL=" + x2lon(surveyL.x) + "," + y2lat(surveyL.y));
+        System.out.println("SurveyR=" + x2lon(surveyR.x) + "," + y2lat(surveyR.y));
+
 
         // get some results
 //        float x0 = (float) (35.5f * deg2cm);
@@ -821,8 +887,8 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
         }
         long tend = System.currentTimeMillis();
         System.out.println("stop reading " + System.currentTimeMillis());
-        float mspc = (float)(tend - tstart) / (float)nbreads;
-        System.out.println(nbreads+" reads, ms per call = " + mspc);
+        float mspc = (float) (tend - tstart) / (float) nbreads;
+        System.out.println(nbreads + " reads, ms per call = " + mspc);
     }
 
     // get a velocity vector from lon, lat, time, depth
