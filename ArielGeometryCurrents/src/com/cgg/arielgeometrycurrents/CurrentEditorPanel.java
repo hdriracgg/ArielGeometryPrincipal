@@ -30,6 +30,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
@@ -40,6 +41,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import org.openide.util.Exceptions;
 import ucar.ma2.Array;
 import ucar.ma2.ArrayFloat;
 import ucar.ma2.ArrayInt;
@@ -75,8 +77,6 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
     double deg2cm = (Math.PI * 637131500.0) / 180.0;
     int previoustimeindex = -1; // Time index of previous lookup
     float[][][][] previous4darray;
-    
-    
     BufferedImage background;
     boolean firstTime = true;
     boolean debug = false;
@@ -134,11 +134,16 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
             background = getbackground();
         }
 
-        JButton jb1 = new JButton("Clear");
+        JButton jb1 = new JButton("Dowork");
         jb1.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                clearpoints();
+                try {
+                    dowork();
+                }
+                catch (IOException | InvalidRangeException ex) {
+                    Exceptions.printStackTrace(ex);
+                }
                 repaint();
             }
         });
@@ -246,7 +251,7 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
     }
 
     private void addpoint(int x, int y) {
-        System.out.println("New real point ="+screen2real(screen2transformed(x, y)));
+        System.out.println("New real point =" + screen2real(screen2transformed(x, y)));
         pointList.add(screen2transformed(x, y));
         speedList.add((float) speed);
         timeList.add(gettotaltime(pointList.size()));
@@ -635,7 +640,6 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
 //        }
 //        ps.close();
 //    }
-
     // Prints the marina trajectories for debug purposes
     private void printmarinatrajectories() {
         // Prepare list of real points
@@ -781,24 +785,71 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
         nxval = vtotshape[1];
         nyval = vtotshape[2];
 
-        testll2xy();
+//        testll2xy();
 
         // get some results
-        float x0 = (float) (35.5f * deg2cm);
-        float y0 = (float) (27.4f * deg2cm);
-        float[] vxy;
-        for (int i = 0; i < 10; i++) {
-            float xm = x0 / 100.0f + i * 10.0f;
-            float ym = y0 / 100.0f + i * 10.0f;
-            float xdeg = (float) (xm * 100.0f * cm2deg);
-            float ydeg = (float) (ym * 100.0f * cm2deg);
-            vxy = getvv(xdeg, ydeg, 5000.0f, 50.0f);
-            System.out.println("xdeg=" + xdeg + " ydeg=" + ydeg + "xm=" + xm + " ym=" + ym + " vxy=" + vxy[0] + "," + vxy[1]);
+//        float x0 = (float) (35.5f * deg2cm);
+//        float y0 = (float) (27.4f * deg2cm);
+//        float[] vxy;
+//        for (int i = 0; i < 10; i++) {
+//            float xm = x0 / 100.0f + i * 10.0f;
+//            float ym = y0 / 100.0f + i * 10.0f;
+//            float xdeg = (float) (xm * 100.0f * cm2deg);
+//            float ydeg = (float) (ym * 100.0f * cm2deg);
+//            vxy = getvv(xdeg, ydeg, 5000.0f, 50.0f);
+//            System.out.println("xdeg=" + xdeg + " ydeg=" + ydeg + "xm=" + xm + " ym=" + ym + " vxy=" + vxy[0] + "," + vxy[1]);
+//        }
+
+        // test performance
+        int nbreads = 100000;
+        float lons[] = new float[nbreads];
+        float lats[] = new float[nbreads];
+        float times[] = new float[nbreads];
+        float depths[] = new float[nbreads];
+        float result[];
+        Random r = new Random();
+        for (int i = 0; i < nbreads; i++) {
+            lats[i] = 27.359522f + (float) (r.nextFloat() * (27.39573f - 27.359522f));
+            lons[i] = 35.43578f + (float) (r.nextFloat() * (35.476562f - 35.43578f));
+            times[i] = 42000.0f * 0.5f;
+            depths[i] = 140.0f * r.nextFloat();
         }
+        long tstart = System.currentTimeMillis();
+        System.out.println("start reading " + System.currentTimeMillis());
+        for (int i = 0; i < nbreads; i++) {
+            result = getvv(lons[i], lats[i], times[i], depths[i]);
+        }
+        long tend = System.currentTimeMillis();
+        System.out.println("stop reading " + System.currentTimeMillis());
+        float mspc = (float)(tend - tstart) / (float)nbreads;
+        System.out.println(nbreads+" reads, ms per call = " + mspc);
     }
 
     // get a velocity vector from lon, lat, time, depth
     float[] getvv(float lon, float lat, float time, float depth) throws IOException, InvalidRangeException {
+        float[] result = new float[2];
+        // get indexes
+        int xy[] = ll2xy(lon, lat);
+        int x = xy[0];
+        int y = xy[1];
+        int t = gettimeindex(time);
+        int d = getdepthindex(depth);
+        int origin[] = new int[5];
+        origin[0] = t;
+        origin[1] = x;
+        origin[2] = y;
+        origin[3] = d;
+        origin[4] = 0;
+        int size[] = new int[]{1, 1, 1, 1, 2};
+        Array data5d = vtot.read(origin, size);
+        Array data1d = data5d.reduce();
+        result[0] = data1d.getFloat(0);
+        result[1] = data1d.getFloat(1);
+        return result;
+    }
+
+    // get a velocity vector from lon, lat, time, depth
+    float[] getcachedvv(float lon, float lat, float time, float depth) throws IOException, InvalidRangeException {
         float[] result = new float[]{0.0f, 0.0f};
         float[][][][] varray;
         // get indexes
@@ -855,8 +906,9 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
     int gettimeindex(float time) {
         return gettimeindex((int) time);
     }
-
     // convert lon, lat to x and y indices
+    double deg2rad = Math.PI / 180.0;
+
     int[] ll2xy(float lon, float lat) {
         int coord = coordval;
         int nx = nxval;
@@ -869,7 +921,6 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
         float dely = delyval;
         float thetad = thetadval;
         int[] result = new int[]{0, 0};
-        double deg2rad = Math.PI / 180.0;
         double xc = ((float) nx + 1.0f) / 2.0f - (delx / gridx);
         double yc = ((float) ny + 1.0f) / 2.0f - (dely / gridy);
 
