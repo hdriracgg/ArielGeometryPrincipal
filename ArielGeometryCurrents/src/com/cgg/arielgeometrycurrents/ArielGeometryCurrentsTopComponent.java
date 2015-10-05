@@ -72,7 +72,12 @@ public final class ArielGeometryCurrentsTopComponent extends TopComponent {
     @Override
     public void componentOpened() {
         System.out.println("ArielGeometryCurrents opened");
-        cep = new CurrentEditorPanel();
+        try {
+            cep = new CurrentEditorPanel();
+        }
+        catch (IOException | InvalidRangeException ex) {
+            Exceptions.printStackTrace(ex);
+        }
         JScrollPane scrollPane = new JScrollPane(cep);
         this.setLayout(new BorderLayout());
         this.add(scrollPane);
