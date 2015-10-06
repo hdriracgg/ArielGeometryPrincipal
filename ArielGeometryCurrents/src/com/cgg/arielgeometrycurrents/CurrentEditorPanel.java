@@ -562,7 +562,8 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
         int previousy = starty;
         for (int i = 0; i < steps; i++) {
             System.out.println("previouslon=" + previouslon + " previouslat=" + previouslat);
-            float[] current = netcdfreader.getvv(previouslon, previouslat, starttime, depth);
+            int timenow = starttime + (int)(i*timestep);
+            float[] current = netcdfreader.getvv(previouslon, previouslat, timenow, depth);
             System.out.println("Current = " + current[0] + "," + current[1]);
             int nextx = previousx + (int) (current[0] * timestep / 100.0f);
             int nexty = previousy + (int) (current[1] * timestep / 100.0f);
