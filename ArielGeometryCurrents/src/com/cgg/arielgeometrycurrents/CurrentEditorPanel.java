@@ -147,10 +147,11 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
         });
         add(jb3);
 
-        jb4 = new JButton("Marinas");
+        jb4 = new JButton("Load MO");
         jb4.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                loadMO();
 //                writingmarinatrajectories = true;
 //                repaint();
 ////                writemarinatrajectories();
@@ -562,7 +563,7 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
         int previousy = starty;
         for (int i = 0; i < steps; i++) {
             System.out.println("previouslon=" + previouslon + " previouslat=" + previouslat);
-            int timenow = starttime + (int)(i*timestep);
+            int timenow = starttime + (int) (i * timestep);
             float[] current = netcdfreader.getvv(previouslon, previouslat, timenow, depth);
             System.out.println("Current = " + current[0] + "," + current[1]);
             int nextx = previousx + (int) (current[0] * timestep / 100.0f);
@@ -646,5 +647,27 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
             int idx = times.size() - 1;
             times.add(times.get(idx) + t);
         }
+    }
+
+    private void loadMO() {
+        JFileChooser jfc = new JFileChooser();
+        jfc.setFileSelectionMode(JFileChooser.OPEN_DIALOG);
+        jfc.setDialogTitle("MetOceanFile");
+        jfc.showOpenDialog(jfc);
+        File file = jfc.getSelectedFile();
+        MetOceanReader mor = new MetOceanReader(file);
+        while (mor.hasNextRecord()) {
+        }
+        System.out.printf("File %s has been read\n", file.getAbsolutePath());
+        
+        jfc = new JFileChooser();
+        jfc.setFileSelectionMode(JFileChooser.OPEN_DIALOG);
+        jfc.setDialogTitle("TideFile");
+        jfc.showOpenDialog(jfc);
+        file = jfc.getSelectedFile();
+        TideReader tr = new TideReader(file);
+        while (tr.hasNextRecord()) {
+        }
+        System.out.printf("File %s has been read\n", file.getAbsolutePath());
     }
 }
