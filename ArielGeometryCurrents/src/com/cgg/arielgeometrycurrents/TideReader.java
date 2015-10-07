@@ -6,9 +6,14 @@ package com.cgg.arielgeometrycurrents;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JFileChooser;
+import org.openide.util.Exceptions;
 
 /**
  *
@@ -22,8 +27,13 @@ public class TideReader {
     String date;
     String timeofday;
     float h;
+    String datetimepattern = "dd/MM/yy HH:mm";
+    SimpleDateFormat datetimeformat;
+    Date javadate;
+    long javatimestamp;
 
     public TideReader(File file) {
+                
         try {
             sc = new Scanner(file);
         }
@@ -32,7 +42,7 @@ public class TideReader {
         }
         filename = file.getName();
 
-        sc.nextLine();   // skip title line
+        datetimeformat = new SimpleDateFormat(datetimepattern);
     }
 
     public boolean hasNextRecord() {
@@ -40,10 +50,19 @@ public class TideReader {
             sc.useDelimiter(" ");
             date = nextstring(sc);
             timeofday = nextstring(sc);
+            String datestring = date + " " + timeofday;
+            try {
+                javadate = datetimeformat.parse(datestring);
+            }
+            catch (ParseException ex) {
+                Exceptions.printStackTrace(ex);
+            }
+            javatimestamp = (javadate.getTime()/1000);
             sc.useDelimiter("\n");
             h = nextfloat(sc);
-            System.out.println("");
-            if(sc.hasNext()) {
+//            System.out.printf("day=%s hour=%s javatimestamp=%d height=%f", date, timeofday, javatimestamp, h);
+//            System.out.println("");
+            if (sc.hasNext()) {
                 sc.nextLine();
             }
             return (true);
@@ -55,7 +74,7 @@ public class TideReader {
 
     private String nextstring(Scanner sc) {
         String s = sc.next();
-        System.out.printf("%s ", s);
+//        System.out.printf("%s ", s);
         return s;
     }
 
@@ -68,7 +87,7 @@ public class TideReader {
         else {
             f = Float.parseFloat(s);
         }
-        System.out.printf("%f ", f);
+//        System.out.printf("%f ", f);
         return f;
     }
 }

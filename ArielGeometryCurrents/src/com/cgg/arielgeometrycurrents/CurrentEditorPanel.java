@@ -650,24 +650,7 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
     }
 
     private void loadMO() {
-        JFileChooser jfc = new JFileChooser();
-        jfc.setFileSelectionMode(JFileChooser.OPEN_DIALOG);
-        jfc.setDialogTitle("MetOceanFile");
-        jfc.showOpenDialog(jfc);
-        File file = jfc.getSelectedFile();
-        MetOceanReader mor = new MetOceanReader(file);
-        while (mor.hasNextRecord()) {
-        }
-        System.out.printf("File %s has been read\n", file.getAbsolutePath());
-        
-        jfc = new JFileChooser();
-        jfc.setFileSelectionMode(JFileChooser.OPEN_DIALOG);
-        jfc.setDialogTitle("TideFile");
-        jfc.showOpenDialog(jfc);
-        file = jfc.getSelectedFile();
-        TideReader tr = new TideReader(file);
-        while (tr.hasNextRecord()) {
-        }
-        System.out.printf("File %s has been read\n", file.getAbsolutePath());
+        MetOceanModel mom = new MetOceanModel();
+        TideModel tm = new TideModel();
     }
 }
