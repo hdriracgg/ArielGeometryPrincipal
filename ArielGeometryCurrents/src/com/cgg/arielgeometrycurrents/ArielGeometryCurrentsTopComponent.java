@@ -13,6 +13,8 @@ import org.openide.awt.ActionReference;
 import org.openide.util.Exceptions;
 import org.openide.windows.TopComponent;
 import org.openide.util.NbBundle.Messages;
+import org.openide.util.lookup.AbstractLookup;
+import org.openide.util.lookup.InstanceContent;
 import ucar.ma2.InvalidRangeException;
 
 /**
@@ -39,12 +41,14 @@ import ucar.ma2.InvalidRangeException;
 public final class ArielGeometryCurrentsTopComponent extends TopComponent {
 
     CurrentEditorPanel cep;
+    private InstanceContent content = null;
 
     public ArielGeometryCurrentsTopComponent() {
         initComponents();
         setName(Bundle.CTL_ArielGeometryCurrentsTopComponent());
         setToolTipText(Bundle.HINT_ArielGeometryCurrentsTopComponent());
-
+        content = new InstanceContent();
+        associateLookup(new AbstractLookup(content));
     }
 
     /**
@@ -73,7 +77,7 @@ public final class ArielGeometryCurrentsTopComponent extends TopComponent {
     public void componentOpened() {
         System.out.println("ArielGeometryCurrents opened");
         try {
-            cep = new CurrentEditorPanel();
+            cep = new CurrentEditorPanel(this);
         }
         catch (IOException | InvalidRangeException ex) {
             Exceptions.printStackTrace(ex);
@@ -81,8 +85,11 @@ public final class ArielGeometryCurrentsTopComponent extends TopComponent {
         JScrollPane scrollPane = new JScrollPane(cep);
         this.setLayout(new BorderLayout());
         this.add(scrollPane);
-        //        result = org.openide.util.Utilities.actionsGlobalContext().lookupResult(AbstractGeometryModel.class);
-        //        result.addLookupListener(this);
+    }
+
+    void updateTideModel(TideModel tm) {
+        System.out.println("agctc update");
+        content.add(tm);
     }
 
     @Override

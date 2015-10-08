@@ -44,6 +44,7 @@ import ucar.nc2.Variable;
  */
 public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMotionListener, MouseWheelListener {
 
+    ArielGeometryCurrentsTopComponent agctc;
     NetcdfFile ncFile = null;
     int coordval;       // coordinate flag 
     // 0 = tangent plane, 1 = unrotated spherical grid, 3 = rotated spherical grid.
@@ -109,7 +110,8 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
     float depth = 50.0f;
     int steps = 10;
 
-    public CurrentEditorPanel() throws IOException, InvalidRangeException {
+    public CurrentEditorPanel(ArielGeometryCurrentsTopComponent agctc) throws IOException, InvalidRangeException {
+        this.agctc = agctc;
         setBackground(Color.white);
         addMouseMotionListener(this);
         addMouseListener(this);
@@ -650,7 +652,8 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
     }
 
     private void loadMO() {
-        MetOceanModel mom = new MetOceanModel();
+//        MetOceanModel mom = new MetOceanModel();
         TideModel tm = new TideModel();
+        agctc.updateTideModel(tm);
     }
 }
