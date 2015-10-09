@@ -4,23 +4,15 @@
  */
 package com.cgg.arielgeometrycurrents;
 
-import java.awt.BorderLayout;
 import java.io.File;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import javax.swing.JButton;
+import java.util.TreeMap;
 import javax.swing.JFileChooser;
-import javax.swing.JPanel;
 import org.apache.commons.math3.complex.Complex;
 import org.apache.commons.math3.transform.DftNormalization;
 import org.apache.commons.math3.transform.FastFourierTransformer;
 import org.apache.commons.math3.transform.TransformType;
-import org.apache.commons.math3.transform.TransformUtils;
-import org.openide.util.lookup.AbstractLookup;
-import org.openide.util.lookup.InstanceContent;
 
 /**
  *
@@ -32,7 +24,7 @@ public class TideModel {
     public Complex[] fftresult;
 
     public TideModel() {
-        heightMap = new HashMap<>();
+        heightMap = new TreeMap<>();
         JFileChooser jfc = new JFileChooser();
         jfc.setFileSelectionMode(JFileChooser.OPEN_DIALOG);
         jfc.setDialogTitle("TideFile");
@@ -62,16 +54,13 @@ public class TideModel {
         int i = 0;
         int indexofmax = 0;
         double max = 0;
-//        for (Date d : heightMap.keySet()) {
-//            values[i++] = heightMap.get(d);
-//        }
-//        while (i < len) {
-//            values[i++] = 0.0d;
-//        }
-        for(int k =0; k < len; k++) {
-            values[k] = Math.sin(2*Math.PI*k/len);
+        for (Date d : heightMap.keySet()) {
+            values[i++] = heightMap.get(d);
         }
-        System.out.println("before fft");
+        while (i < len) {
+            values[i++] = 0.0d;
+        }
+        System.out.println("before fft, number of samples = "+len);
         fftresult = fft.transform(values, TransformType.FORWARD);
         System.out.println("afterfft");
         for (int j = 0; j < fftresult.length; j++) {
