@@ -21,23 +21,23 @@ import org.openide.util.Exceptions;
 public class MetOceanReader {
 
     Scanner sc;
-    String filename;
+    public String filename;
     boolean debug = false;
-    String date_time;
-    String buoyname;
-    String longitude;
-    String latitude;
-    long timestamp;
-    long javatimestamp;
-    float x;
-    float y;
-    float depth;
-    float vx;
-    float vy;
-    float v;
+    public String date_time;
+    public String buoyname;
+    public String longitude;
+    public String latitude;
+    public long timestamp;
+    public long javatimestamp;
+    public float x;
+    public float y;
+    public float depth;
+    public float vx;
+    public float vy;
+    public float v;
     String datetimepattern = "dd/MM/yy HH:mm:ss";
     SimpleDateFormat datetimeformat;
-    Date javadate;
+    public Date javadate;
     long calculatedtimestamp;
 
     public MetOceanReader(File file) {

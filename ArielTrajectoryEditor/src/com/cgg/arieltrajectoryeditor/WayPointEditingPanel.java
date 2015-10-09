@@ -4,6 +4,7 @@
  */
 package com.cgg.arieltrajectoryeditor;
 
+import com.cgg.arielgeometrycurrents.MetOceanReader;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -28,6 +29,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -85,6 +87,8 @@ public class WayPointEditingPanel extends JPanel implements MouseListener, Mouse
     boolean writingsourcetrajectories = false;
     JButton jb4;
     JButton jb5;
+    JButton jb6;
+    JTextField jtf1;
     Color defaultfg;
     Color defaultbg;
     Stroke widestroke;
@@ -161,12 +165,21 @@ public class WayPointEditingPanel extends JPanel implements MouseListener, Mouse
         });
         add(jb5);
 
+        jb6 = new JButton("Load Buoy");
+        jb6.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                loadbuoy();
+            }
+        });
+        add(jb6);
+
         JLabel jl1 = new JLabel("Start Time = ");
         jl1.setOpaque(true);
         jl1.setBackground(Color.LIGHT_GRAY);
         add(jl1);
 
-        final JTextField jtf1 = new JTextField();
+        jtf1 = new JTextField();
         jtf1.setText(Long.toString(starttime));
         jtf1.setToolTipText("Hit Enter key to confirm");
         jtf1.setPreferredSize(new Dimension(50, 27));
@@ -475,10 +488,10 @@ public class WayPointEditingPanel extends JPanel implements MouseListener, Mouse
     private String gettimefromp(Point p) {
         int idx = pointList.indexOf(p);
         float flt = timeList.get(idx);
-        int timeinsecs = (int)flt;
-        int hours = timeinsecs/3600;
-        int minutes = (timeinsecs%3600)/60;
-        int secs = timeinsecs%60;
+        int timeinsecs = (int) flt;
+        int hours = timeinsecs / 3600;
+        int minutes = (timeinsecs % 3600) / 60;
+        int secs = timeinsecs % 60;
         return String.format("%d:%d:%d %ds", hours, minutes, secs, timeinsecs);
     }
 
@@ -495,6 +508,25 @@ public class WayPointEditingPanel extends JPanel implements MouseListener, Mouse
         int x = xorigin + (int) (xscale * (p.x - xoffset));
         int y = yorigin - (int) (yscale * (p.y - yoffset));
         return new Point(x, y);
+    }
+
+    private Point real2transformed(Point p) {
+        int x = (int) ((p.x - xorigin) / xscale) + xoffset;
+        int y = (int) ((yorigin - p.y) / yscale) + yoffset;
+        return new Point(x, y);
+    }
+
+    private Point real2screen(Point p) {
+        Point transformed = real2transformed(p);
+        return transformed2screen(transformed.x, transformed.y);
+    }
+
+    private Point transformed2screen(int x, int y) {
+        return new Point((int) ((itlx + x) * scale), (int) ((itly + y) / scale));
+    }
+
+    private Point transformed2screen(Point p) {
+        return transformed2screen(p.x, p.y);
     }
 
     private List<Point> printpoints() {
@@ -662,6 +694,30 @@ public class WayPointEditingPanel extends JPanel implements MouseListener, Mouse
             ps = null;
         }
         return ps;
+    }
+
+    private void loadbuoy() {
+        JFileChooser jfc = new JFileChooser("C:\\Users\\jgrimsdale\\Desktop");
+        jfc.setFileSelectionMode(JFileChooser.OPEN_DIALOG);
+        jfc.setDialogTitle("Select Buoy trajectory file");
+        jfc.showOpenDialog(this);
+        File file = jfc.getSelectedFile();
+        MetOceanReader mor = new MetOceanReader(file);
+        Date startdate = null;
+        while (mor.hasNextRecord()) {
+            if (startdate == null) {
+                startdate = mor.javadate;
+            }
+            Point p = real2screen(new Point((int) mor.x, (int) mor.y));
+            speed = (int) (100.0f * Math.hypot(mor.vx, mor.vy));
+            addpoint(p.x, p.y);
+        }
+        if(startdate != null) {
+            starttime = (startdate.getTime() / 1000) - 1440000000;
+        }
+        jtf1.setText(Long.toString(starttime));
+        System.out.println("startime=" + starttime);
+        repaint();
     }
 
     private void calibrate() {

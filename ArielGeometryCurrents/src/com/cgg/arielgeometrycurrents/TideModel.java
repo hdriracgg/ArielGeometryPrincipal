@@ -21,10 +21,12 @@ import org.apache.commons.math3.transform.TransformType;
 public class TideModel {
 
     Map<Date, Float> heightMap;
+    Map<Date, Float> rateofchangeMap;
     public Complex[] fftresult;
 
     public TideModel() {
         heightMap = new TreeMap<>();
+        rateofchangeMap = new TreeMap<>();
         JFileChooser jfc = new JFileChooser();
         jfc.setFileSelectionMode(JFileChooser.OPEN_DIALOG);
         jfc.setDialogTitle("TideFile");
@@ -33,6 +35,7 @@ public class TideModel {
         TideReader tr = new TideReader(file);
         int records = 0;
         int duplicates = 0;
+        float previousheight = 0.0f;
         while (tr.hasNextRecord()) {
             records++;
             Date javadate = tr.javadate;
@@ -40,13 +43,17 @@ public class TideModel {
                 duplicates++;
                 System.out.printf("Duplicate: Date=%s %s h1=%f h2=%f\n", tr.date, tr.timeofday, heightMap.get(javadate), tr.h);
             }
-            heightMap.put(tr.javadate, tr.h);
+            float nextheight = tr.h;
+            heightMap.put(tr.javadate, nextheight);
+            float rateofchange = (nextheight - previousheight) / (5 * 60);
+            rateofchangeMap.put(tr.javadate, rateofchange);
+            previousheight = nextheight;
         }
         System.out.printf("%d records of which %d duplicates read from file %s\n", records, duplicates, file.getAbsolutePath());
         fft();
     }
 
-    void fft() {
+    final void fft() {
         FastFourierTransformer fft = new FastFourierTransformer(DftNormalization.STANDARD);
         int size = heightMap.size();
         int len = nextpowerof2(size);
@@ -60,7 +67,7 @@ public class TideModel {
         while (i < len) {
             values[i++] = 0.0d;
         }
-        System.out.println("before fft, number of samples = "+len);
+        System.out.println("before fft, number of samples = " + len);
         fftresult = fft.transform(values, TransformType.FORWARD);
         System.out.println("afterfft");
         for (int j = 0; j < fftresult.length; j++) {
