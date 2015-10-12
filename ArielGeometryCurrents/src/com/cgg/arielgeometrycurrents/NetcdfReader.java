@@ -166,7 +166,7 @@ public class NetcdfReader {
     }
 
     // get a velocity vector from lon, lat, time, depth
-    float[] getvv(float lon, float lat, float time, float depth) throws IOException, InvalidRangeException {
+    public float[] getvv(float lon, float lat, float time, float depth) throws IOException, InvalidRangeException {
         float[] result = new float[2];
         // get indexes
         int xy[] = ll2xy(lon, lat);

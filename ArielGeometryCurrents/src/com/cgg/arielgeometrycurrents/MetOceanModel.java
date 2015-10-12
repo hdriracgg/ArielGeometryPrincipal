@@ -19,7 +19,7 @@ public class MetOceanModel {
     
     //    Each buoy has a Map of date, record
     //   Map<buoyname, Map<javadate, MORrecord>>
-    Map<String, Map<Date, MORecord>> buoyMap;
+    public Map<String, Map<Date, MORecord>> buoyMap;
 
     public MetOceanModel() {
         buoyMap = new HashMap<>();
@@ -62,7 +62,7 @@ public class MetOceanModel {
         System.out.printf("%d records of which %d duplicates read from file %s\n", records, duplicates, file.getAbsolutePath());
     }
     
-    private class MORecord {
+    public class MORecord {
         Date javadate;
         float depth;
         float[] current;
