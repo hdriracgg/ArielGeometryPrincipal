@@ -29,7 +29,7 @@ import org.openide.util.lookup.InstanceContent;
         preferredID = "ArielGeometryJFCViewerTopComponent",
         //iconBase="SET/PATH/TO/ICON/HERE", 
         persistenceType = TopComponent.PERSISTENCE_ALWAYS)
-@TopComponent.Registration(mode = "editor", openAtStartup = true)
+@TopComponent.Registration(mode = "editor", openAtStartup = false)
 @ActionID(category = "Window", id = "com.cgg.arielgeometryjfcviewer.ArielGeometryJFCViewerTopComponent")
 @ActionReference(path = "Menu/Window" /*, position = 333 */)
 @TopComponent.OpenActionRegistration(
