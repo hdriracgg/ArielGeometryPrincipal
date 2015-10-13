@@ -16,10 +16,13 @@ import javax.swing.JFileChooser;
  * @author jgrimsdale
  */
 public class MetOceanModel {
-    
+
     //    Each buoy has a Map of date, record
     //   Map<buoyname, Map<javadate, MORrecord>>
     public Map<String, Map<Date, MORecord>> buoyMap;
+    public long maxtime = Long.MIN_VALUE;
+    public long mintime = Long.MAX_VALUE;
+    public long timerange = 0;
 
     public MetOceanModel() {
         buoyMap = new HashMap<>();
@@ -35,20 +38,21 @@ public class MetOceanModel {
             records++;
             MORecord record = new MORecord();
             Date javadate = mor.javadate;
+            setminmax(javadate);
             record.javadate = javadate;
             record.depth = mor.depth;
             float[] current = new float[2];
             current[0] = mor.vx;
             current[1] = mor.vy;
             record.current = current;
-            Point position = new Point((int)mor.x, (int)mor.y);
+            Point position = new Point((int) mor.x, (int) mor.y);
             record.position = position;
             String buoyname = mor.buoyname;
-            if(buoyMap.containsKey(buoyname)) {
-                if(buoyMap.get(buoyname).containsKey(javadate)) {
+            if (buoyMap.containsKey(buoyname)) {
+                if (buoyMap.get(buoyname).containsKey(javadate)) {
                     duplicates++;
-                    System.out.printf("duplicate: buoyname=%s datetime=%s x1=%d x2=%f\n", buoyname, mor.date_time, 
-                            buoyMap.get(buoyname).get(javadate).position.x, 
+                    System.out.printf("duplicate: buoyname=%s datetime=%s x1=%d x2=%f\n", buoyname, mor.date_time,
+                            buoyMap.get(buoyname).get(javadate).position.x,
                             mor.x);
                 }
                 buoyMap.get(buoyname).put(javadate, record);
@@ -59,13 +63,25 @@ public class MetOceanModel {
                 buoyMap.put(buoyname, m);
             }
         }
+        timerange = maxtime - mintime;
         System.out.printf("%d records of which %d duplicates read from file %s\n", records, duplicates, file.getAbsolutePath());
     }
-    
+
+    private void setminmax(Date d) {
+        long t = d.getTime();
+        if (t > maxtime) {
+            maxtime = t;
+        }
+        if (t < mintime) {
+            mintime = t;
+        }
+    }
+
     public class MORecord {
-        Date javadate;
-        float depth;
-        float[] current;
-        Point position;
+
+        public Date javadate;
+        public float depth;
+        public float[] current;
+        public Point position;
     }
 }

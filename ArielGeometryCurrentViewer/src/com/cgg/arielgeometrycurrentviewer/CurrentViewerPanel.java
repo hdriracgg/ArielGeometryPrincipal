@@ -13,6 +13,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Paint;
 import java.awt.Point;
 import java.awt.Stroke;
 import java.awt.event.ActionEvent;
@@ -37,7 +38,10 @@ import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSlider;
 import javax.swing.JTextField;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.openide.util.Exceptions;
 import ucar.ma2.InvalidRangeException;
@@ -108,6 +112,7 @@ public class CurrentViewerPanel extends JPanel implements MouseListener, MouseMo
     int starttime = 5000;
     JButton jb4;
     JButton jb5;
+    JSlider js1;
     Color defaultfg;
     Color defaultbg;
     Stroke widestroke;
@@ -115,6 +120,8 @@ public class CurrentViewerPanel extends JPanel implements MouseListener, MouseMo
     float timestep = 3600.0f;
     float depth = 50.0f;
     int steps = 10;
+    int currentphase = 0;
+    MetOceanModel mom;
 
     public CurrentViewerPanel(ArielGeometryCurrentViewerTopComponent agcvtc) throws IOException, InvalidRangeException {
         this.agcvtc = agcvtc;
@@ -169,77 +176,94 @@ public class CurrentViewerPanel extends JPanel implements MouseListener, MouseMo
         });
         add(jb4);
 
-        JLabel jl1 = new JLabel("Start time in s = ");
+        JLabel jl1 = new JLabel("Min depth = ");
         jl1.setOpaque(true);
         jl1.setBackground(Color.LIGHT_GRAY);
         add(jl1);
 
         final JTextField jtf1 = new JTextField();
-        jtf1.setText(Integer.toString(starttime));
+        jtf1.setText(Float.toString(mindepth));
         jtf1.setToolTipText("Hit Enter key to confirm");
         jtf1.setPreferredSize(new Dimension(50, 27));
         jtf1.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                starttime = Integer.parseInt(jtf1.getText());
-                System.out.println("Start time changed to " + starttime + " s");
+                mindepth = Float.parseFloat(jtf1.getText());
+                System.out.println("Minimum depth changed to " + mindepth);
+                classifybyphase();
+                repaint();
             }
         });
         add(jtf1);
 
-        JLabel jl2 = new JLabel("Timestep in s = ");
+        JLabel jl2 = new JLabel("Max depth = ");
         jl2.setOpaque(true);
         jl2.setBackground(Color.LIGHT_GRAY);
         add(jl2);
 
         final JTextField jtf2 = new JTextField();
-        jtf2.setText(Float.toString(timestep));
+        jtf2.setText(Float.toString(maxdepth));
         jtf2.setToolTipText("Hit Enter key to confirm");
         jtf2.setPreferredSize(new Dimension(50, 27));
         jtf2.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                timestep = Float.parseFloat(jtf2.getText());
-                System.out.println("timestep changed to " + timestep + " s");
+                maxdepth = Float.parseFloat(jtf2.getText());
+                System.out.println("max depth changed to " + maxdepth);
+                classifybyphase();
+                repaint();
             }
         });
         add(jtf2);
 
-        JLabel jl3 = new JLabel("Depth in m = ");
-        jl3.setOpaque(true);
-        jl3.setBackground(Color.LIGHT_GRAY);
-        add(jl3);
+//        JLabel jl3 = new JLabel("Depth in m = ");
+//        jl3.setOpaque(true);
+//        jl3.setBackground(Color.LIGHT_GRAY);
+//        add(jl3);
+//
+//        final JTextField jtf3 = new JTextField();
+//        jtf3.setText(Float.toString(depth));
+//        jtf3.setToolTipText("Hit Enter key to confirm");
+//        jtf3.setPreferredSize(new Dimension(50, 27));
+//        jtf3.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                depth = Float.parseFloat(jtf3.getText());
+//                System.out.println("depth changed to " + depth + " s");
+//            }
+//        });
+//        add(jtf3);
 
-        final JTextField jtf3 = new JTextField();
-        jtf3.setText(Float.toString(depth));
-        jtf3.setToolTipText("Hit Enter key to confirm");
-        jtf3.setPreferredSize(new Dimension(50, 27));
-        jtf3.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                depth = Float.parseFloat(jtf3.getText());
-                System.out.println("depth changed to " + depth + " s");
-            }
-        });
-        add(jtf3);
-
-        JLabel jl4 = new JLabel("Steps = ");
+        JLabel jl4 = new JLabel("Current phase = ");
         jl4.setOpaque(true);
         jl4.setBackground(Color.LIGHT_GRAY);
         add(jl4);
 
         final JTextField jtf4 = new JTextField();
-        jtf4.setText(Integer.toString(steps));
-        jtf4.setToolTipText("Hit Enter key to confirm");
+        jtf4.setText(Integer.toString(currentphase));
+        jtf4.setToolTipText("Current phase");
         jtf4.setPreferredSize(new Dimension(50, 27));
         jtf4.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                steps = Integer.parseInt(jtf4.getText());
-                System.out.println("steps changed to " + steps);
+                currentphase = Integer.parseInt(jtf4.getText());
+                System.out.println("current phase changed to " + currentphase);
+                repaint();
             }
         });
         add(jtf4);
+
+        js1 = new JSlider(0, phaseclasses - 1);
+        js1.setToolTipText("Slide to change tide phase");
+        js1.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                currentphase = js1.getValue();
+                jtf4.setText(Integer.toString(currentphase));
+                repaint();
+            }
+        });
+        add(js1);
 
         calibrationpointlist = new ArrayList<>();
         trajectoryList = new ArrayList<>();
@@ -374,23 +398,23 @@ public class CurrentViewerPanel extends JPanel implements MouseListener, MouseMo
         g2.drawImage(background, 0, 0, this);
         Stroke defaultstroke = g2.getStroke();
         Color defaultcolor = g2.getColor();
-        if (marinapointList != null) {
-            g2.setStroke(widestroke);
-            g2.setColor(Color.RED);
-            sourcepointList = pointList;
-            sourcespeedList = speedList;
-            sourcetimeList = timeList;
-            pointList = marinapointList;
-            speedList = marinaspeedList;
-            timeList = marinatimeList;
-            painttrajectories(g2);
-            pointList = sourcepointList;
-            speedList = sourcespeedList;
-            timeList = sourcetimeList;
-        }
+//        if (marinapointList != null) {
+//            g2.setStroke(widestroke);
+//            g2.setColor(Color.RED);
+//            sourcepointList = pointList;
+//            sourcespeedList = speedList;
+//            sourcetimeList = timeList;
+//            pointList = marinapointList;
+//            speedList = marinaspeedList;
+//            timeList = marinatimeList;
+//            paintphaseclassvelocities(g2, 1);
+//            pointList = sourcepointList;
+//            speedList = sourcespeedList;
+//            timeList = sourcetimeList;
+//        }
         g2.setStroke(defaultstroke);
         g2.setColor(defaultcolor);
-        painttrajectories(g2);
+        paintphaseclassvelocities(g2, currentphase);
         if (!calibrationpointlist.isEmpty()) {
             for (Point p : calibrationpointlist) {
                 drawpoint(g2, p.x, p.y);
@@ -656,27 +680,86 @@ public class CurrentViewerPanel extends JPanel implements MouseListener, MouseMo
             times.add(times.get(idx) + t);
         }
     }
-    
     //    Each buoy has a Map of date, record
     //   Map<buoyname, Map<javadate, MORrecord>>
-    public Map<String, Map<Date, MetOceanModel.MORecord>> buoyMap;
-    Map<Integer, MetOceanModel.MORecord> phaseMap;
-    int phaseclasses = 12; // number of tide phase classes
+    public Map<String, Map<Date, MetOceanModel.MORecord>> buoyMap = null;
+    Map<Integer, List<MetOceanModel.MORecord>> phaseMap = null;
+    List<MetOceanModel.MORecord> recordList = null;
+    int phaseclasses = 6;     // number of tide phase classes
     float tideperiod = 12.53f; // period from high tide to high tide
+//    float tideperiod = 24.8f; // period from high tide to high tide
+    float linescale = 1000.0f;   // scale factor for current line
+    float mindepth = 5.0f;
+    float maxdepth = 30.0f;
 
     private void loadMO() {
-        MetOceanModel mom = new MetOceanModel();
+        mom = new MetOceanModel();
         buoyMap = mom.buoyMap;
+        classifybyphase();
 //        TideModel tm = new TideModel();
 //        agcvtc.updateTideModel(tm);
     }
 
+    private void paintphaseclassvelocities(Graphics2D g2, Integer phaseclass) {
+        if (phaseMap == null) {
+            return;
+        }
+        recordList = phaseMap.get(phaseclass);
+        if (recordList == null) {
+            return;
+        }
+        InterpolatedColorMaker icm = new InterpolatedColorMaker(mom.mintime, mom.maxtime, mom.timerange);
+        for (MetOceanModel.MORecord mor : recordList) {
+            paintvelocity(g2, mor, icm);
+        }
+    }
+
+    private void paintvelocity(Graphics2D g2, MetOceanModel.MORecord mor, InterpolatedColorMaker icm) {
+        int realstartx = mor.position.x;
+        int realstarty = mor.position.y;
+        int realendx = realstartx + (int) (linescale * mor.current[0]);
+        int realendy = realstarty + (int) (linescale * mor.current[1]);
+        Point realstartpoint = new Point(realstartx, realstarty);
+        Point realendpoint = new Point(realendx, realendy);
+        Point transformedstartpoint = real2transformed(realstartpoint);
+        Point transformedendpoint = real2transformed(realendpoint);
+
+        Color oldcolor = g2.getColor();
+        g2.setPaint(icm.getPaint(mor.javadate.getTime()));
+        drawpoint(g2, transformedstartpoint.x, transformedstartpoint.y);
+        drawline(g2, transformedstartpoint, transformedendpoint);
+        g2.setColor(oldcolor);
+    }
+    
     private void classifybyphase() {
         phaseMap = new TreeMap<>();
-        for(String buoy : buoyMap.keySet()) {
-            for(Date d : buoyMap.get(buoy).keySet()) {
+        for (String buoy : buoyMap.keySet()) {
+            for (Date d : buoyMap.get(buoy).keySet()) {
                 MetOceanModel.MORecord mor = buoyMap.get(buoy).get(d);
+                if(mor.depth < mindepth || mor.depth > maxdepth) {
+                    continue;
+                }
+                Integer phaseclass = getphaseclass(d);
+                if (phaseMap.containsKey(phaseclass)) {
+                    recordList = phaseMap.get(phaseclass);
+                }
+                else {
+                    recordList = new ArrayList<>();
+                    phaseMap.put(phaseclass, recordList);
+                }
+                recordList.add(mor);
             }
         }
+        for (Integer phaseclass : phaseMap.keySet()) {
+            System.out.printf("Class %d has %d points\n", phaseclass, phaseMap.get(phaseclass).size());
+        }
+    }
+
+    private int getphaseclass(Date d) {
+        long secs = d.getTime();
+        long secondsperphase = (long) (tideperiod * 3600.0f);
+        long secondsperphaseclass = secondsperphase / phaseclasses;
+        long exactphase = secs % secondsperphase;
+        return (int) (exactphase / secondsperphaseclass);
     }
 }
