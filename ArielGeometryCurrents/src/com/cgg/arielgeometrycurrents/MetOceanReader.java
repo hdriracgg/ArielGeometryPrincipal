@@ -27,7 +27,7 @@ public class MetOceanReader {
     public String buoyname;
     public String longitude;
     public String latitude;
-    public long timestamp;
+    public String timestamp;
     public long javatimestamp;
     public float x;
     public float y;
@@ -56,11 +56,14 @@ public class MetOceanReader {
         if (sc.hasNext()) {
             sc.useDelimiter(";");
             date_time = nextstring(sc);
+            if(date_time.isEmpty()) {
+                return false;
+            }
             javatimestamp = getjavatimestamp(date_time);
             buoyname = nextstring(sc);
             longitude = nextstring(sc);
             latitude = nextstring(sc);
-            timestamp = nextlong(sc);
+            timestamp = nextstring(sc);
             x = nextfloat(sc);
             y = nextfloat(sc);
             depth = nextfloat(sc);
@@ -102,6 +105,9 @@ public class MetOceanReader {
     private float nextfloat(Scanner sc) {
         float f;
         String s = sc.next().replace(",", ".").replace(";", "").trim();
+        if(s.startsWith("x")) {
+            return 0.0f;
+        }
         if (s.isEmpty()) {
             f = 0.0f;
         }
