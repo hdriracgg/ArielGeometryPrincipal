@@ -258,7 +258,6 @@ public class CurrentViewerPanel extends JPanel implements MouseListener, MouseMo
         }
         else {
             if (e.getButton() == MouseEvent.BUTTON1) {
-                
             }
         }
         repaint();
@@ -377,15 +376,14 @@ public class CurrentViewerPanel extends JPanel implements MouseListener, MouseMo
         calibrationpointlist.add(new Point(3890, 3248));
         defaultcalibration = false;
     }
-
     //    Each buoy has a Map of date, record
     //   Map<buoyname, Map<javadate, MORrecord>>
     public Map<String, Map<Date, MetOceanModel.MORecord>> buoyMap = null;
     Map<Integer, List<MetOceanModel.MORecord>> phaseMap = null;
     List<MetOceanModel.MORecord> recordList = null;
     int phaseclasses = 6;     // number of tide phase classes
-    float tideperiod = 12.53f; // period from high tide to high tide
-//    float tideperiod = 4.18f; // period from high tide to high tide
+    float tideperiod = 12.41f; // period from high tide to high tide
+//    float tideperiod = 12.53f; // period from high tide to high tide
 //    float tideperiod = 24.8f; // period from high tide to high tide
     float linescale = 1000.0f;   // scale factor for current line
     float mindepth = 5.0f;

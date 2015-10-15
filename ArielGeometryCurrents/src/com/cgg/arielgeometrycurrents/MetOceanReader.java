@@ -49,15 +49,22 @@ public class MetOceanReader {
         }
         filename = file.getName();
         datetimeformat = new SimpleDateFormat(datetimepattern);
-        sc.nextLine();   // skip title line
     }
 
     public boolean hasNextRecord() {
         if (sc.hasNext()) {
             sc.useDelimiter(";");
             date_time = nextstring(sc);
-            if(date_time.isEmpty()) {
+            if (date_time.isEmpty()) {
                 return false;
+            }
+            // skip headers
+            if (date_time.contains("Date")) {
+                sc.nextLine();
+                date_time = nextstring(sc);
+                if (date_time.isEmpty()) {
+                    return false;
+                }
             }
             javatimestamp = getjavatimestamp(date_time);
             buoyname = nextstring(sc);
@@ -105,7 +112,7 @@ public class MetOceanReader {
     private float nextfloat(Scanner sc) {
         float f;
         String s = sc.next().replace(",", ".").replace(";", "").trim();
-        if(s.startsWith("x")) {
+        if (s.startsWith("x") || s.startsWith("NaN") || s.startsWith("#VAL")) {
             return 0.0f;
         }
         if (s.isEmpty()) {

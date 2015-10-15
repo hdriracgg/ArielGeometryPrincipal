@@ -13,16 +13,13 @@ import java.awt.Paint;
  */
 public class InterpolatedColorMaker {
 
-    private float max;
-    private float upper;
-    private float lower;
-    private static boolean debug = false;
+    private long max;
+    private long lower;
 
     public InterpolatedColorMaker(long lower, long upper, long range) {
 //        this.max = 0.1f + (float) range / 3.0f;
-        this.max = (float) range / 3.0f;
-        this.lower = (float) lower;
-        this.upper = (float) upper;
+        this.max = range / 3;
+        this.lower = lower;
     }
 
     public Paint getPaint(long value) {
