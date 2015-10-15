@@ -86,14 +86,14 @@ public class UKOOAwriter {
     }
 
     void writeheader() {
-        ps.printf("%-80s\n", "H0300CLIENT                     DetNorske");
-        ps.printf("%-80s\n", "H0400GEOPHYSICAL CONTRACTOR     CGG       ");
-        ps.printf("%-80s\n", "H0500POSITIONING CONTRACTOR     Veripos and CC Technologies");
-        ps.printf("%-80s\n", "H0600POSITIONING PROCESSING     CGG                         ");
-        ps.printf("%-80s\n", "H0700POSITIONING SYSTEM         SeaPro Nav 3.0               ");
+        ps.printf("%-80s\n", "H0300CLIENT                     SAUDI ARAMCO");
+        ps.printf("%-80s\n", "H0400GEOPHYSICAL CONTRACTOR     ARGAS");
+        ps.printf("%-80s\n", "H0500POSITIONING CONTRACTOR     ????");
+        ps.printf("%-80s\n", "H0600POSITIONING PROCESSING     ???");
+        ps.printf("%-80s\n", "H0700POSITIONING SYSTEM         GATOR               ");
         ps.printf("%-80s\n", "H1800PROJECTION TYPE            001 UNIVERSAL TRANSVERSE MERCATOR");
         ps.printf("%-80s\n", "H1810TOWNSHIP COORDS (TYPE2)    N/A                               ");
-        ps.printf("%-80s\n", "H1900PROJECTION ZONE            ZONE 34  NORTHERN HEMISPHERE      ");
+        ps.printf("%-80s\n", "H1900PROJECTION ZONE            ZONE 37  NORTHERN HEMISPHERE      ");
         ps.printf("%-80s\n", "H1910PRINCIPLE MERID (TYPE2)    N/A                               ");
         ps.printf("%-80s\n", "H2000GRID UNITS                 1METRES                   1.000000000000");
         ps.printf("%-80s\n", "H2001HEIGHT UNITS               1METRES                   1.000000000000 ");

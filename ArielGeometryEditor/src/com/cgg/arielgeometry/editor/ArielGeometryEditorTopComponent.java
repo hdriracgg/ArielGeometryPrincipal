@@ -11,6 +11,8 @@ import com.cgg.arielgeometry.model.io.UKOOAwriter;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.File;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
@@ -96,7 +98,7 @@ public final class ArielGeometryEditorTopComponent extends TopComponent {
         bxs = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
         bys = new javax.swing.JTextField();
-        MovingButton = new javax.swing.JButton();
+        UKOOAButton = new javax.swing.JButton();
         jLabel6 = new javax.swing.JLabel();
         speedx = new javax.swing.JTextField();
         jLabel7 = new javax.swing.JLabel();
@@ -159,7 +161,7 @@ public final class ArielGeometryEditorTopComponent extends TopComponent {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel26)
-                .addContainerGap(713, Short.MAX_VALUE))
+                .addContainerGap(766, Short.MAX_VALUE))
         );
 
         jScrollPane2.setViewportView(jPanel2);
@@ -236,10 +238,11 @@ public final class ArielGeometryEditorTopComponent extends TopComponent {
 
         bys.setText(org.openide.util.NbBundle.getMessage(ArielGeometryEditorTopComponent.class, "ArielGeometryEditorTopComponent.bys.text")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(MovingButton, org.openide.util.NbBundle.getMessage(ArielGeometryEditorTopComponent.class, "ArielGeometryEditorTopComponent.MovingButton.text")); // NOI18N
-        MovingButton.addActionListener(new java.awt.event.ActionListener() {
+        org.openide.awt.Mnemonics.setLocalizedText(UKOOAButton, org.openide.util.NbBundle.getMessage(ArielGeometryEditorTopComponent.class, "ArielGeometryEditorTopComponent.UKOOAButton.text")); // NOI18N
+        UKOOAButton.setActionCommand(org.openide.util.NbBundle.getMessage(ArielGeometryEditorTopComponent.class, "ArielGeometryEditorTopComponent.UKOOAButton.actionCommand")); // NOI18N
+        UKOOAButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                MovingButtonActionPerformed(evt);
+                UKOOAButtonActionPerformed(evt);
             }
         });
 
@@ -364,7 +367,7 @@ public final class ArielGeometryEditorTopComponent extends TopComponent {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel27)
                     .addComponent(backgroundImage))
-                .addContainerGap(441, Short.MAX_VALUE))
+                .addContainerGap(443, Short.MAX_VALUE))
             .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jPanel1Layout.createSequentialGroup()
                     .addContainerGap()
@@ -374,7 +377,7 @@ public final class ArielGeometryEditorTopComponent extends TopComponent {
                                 .addGroup(jPanel1Layout.createSequentialGroup()
                                     .addComponent(StandardButton)
                                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(MovingButton)
+                                    .addComponent(UKOOAButton)
                                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                     .addComponent(SpecialButton)
                                     .addGap(4, 4, 4)
@@ -597,7 +600,7 @@ public final class ArielGeometryEditorTopComponent extends TopComponent {
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(StandardButton)
                         .addComponent(DefaultButton)
-                        .addComponent(MovingButton)
+                        .addComponent(UKOOAButton)
                         .addComponent(printtoggle)
                         .addComponent(SpecialButton)
                         .addComponent(loadfile))
@@ -618,7 +621,7 @@ public final class ArielGeometryEditorTopComponent extends TopComponent {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTabbedPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 768, Short.MAX_VALUE)
+            .addComponent(jTabbedPane1, javax.swing.GroupLayout.Alignment.TRAILING)
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -648,10 +651,14 @@ public final class ArielGeometryEditorTopComponent extends TopComponent {
         // TODO add your handling code here:
     }//GEN-LAST:event_sptiActionPerformed
 
-    private void MovingButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MovingButtonActionPerformed
-        agm = new GeometryModel("ConstantDriftReceiverModel", "MovingShotModel");
-        dowork();
-    }//GEN-LAST:event_MovingButtonActionPerformed
+    private void UKOOAButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_UKOOAButtonActionPerformed
+        if(agm != null) {
+            writeUKOOA();
+        }
+        else {
+            System.out.println("You must build the model first");
+        }
+    }//GEN-LAST:event_UKOOAButtonActionPerformed
 
     private void bxsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bxsActionPerformed
         // TODO add your handling code here:
@@ -671,9 +678,9 @@ public final class ArielGeometryEditorTopComponent extends TopComponent {
     }//GEN-LAST:event_rilsActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton DefaultButton;
-    private javax.swing.JButton MovingButton;
     private javax.swing.JButton SpecialButton;
     private javax.swing.JButton StandardButton;
+    private javax.swing.JButton UKOOAButton;
     private javax.swing.JCheckBox backgroundImage;
     private javax.swing.JTextField bxs;
     private javax.swing.JTextField bys;
@@ -841,6 +848,15 @@ public final class ArielGeometryEditorTopComponent extends TopComponent {
         System.out.println("GeometryEditorTopComponent.printGeometryValues cspeedy = " + speedy.getText());
         System.out.println("GeometryEditorTopComponent.printGeometryValues maxoffset = " + maxoffset.getText());
         System.out.println("");
+    }
+    
+    private void writeUKOOA() {
+        JFileChooser jfc = new JFileChooser();
+        jfc.setDialogTitle("UKOOA output file");
+        jfc.showOpenDialog(this);
+        File file = jfc.getSelectedFile();
+        UKOOAwriter writer = new UKOOAwriter(agm, file.getAbsolutePath());
+        writer.write();
     }
 
     @Override

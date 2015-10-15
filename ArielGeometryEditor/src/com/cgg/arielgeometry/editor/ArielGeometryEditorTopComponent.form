@@ -21,7 +21,7 @@
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Component id="jTabbedPane1" alignment="1" pref="768" max="32767" attributes="0"/>
+          <Component id="jTabbedPane1" alignment="1" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
   </Layout>
@@ -60,7 +60,7 @@
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="jLabel26" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="713" max="32767" attributes="0"/>
+                          <EmptySpace pref="766" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -101,7 +101,7 @@
                               <Component id="jLabel27" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="backgroundImage" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="441" max="32767" attributes="0"/>
+                          <EmptySpace pref="443" max="32767" attributes="0"/>
                       </Group>
                       <Group type="103" rootIndex="1" groupAlignment="0" attributes="0">
                           <Group type="102" attributes="0">
@@ -112,7 +112,7 @@
                                           <Group type="102" alignment="0" attributes="0">
                                               <Component id="StandardButton" min="-2" max="-2" attributes="0"/>
                                               <EmptySpace max="-2" attributes="0"/>
-                                              <Component id="MovingButton" min="-2" max="-2" attributes="0"/>
+                                              <Component id="UKOOAButton" min="-2" max="-2" attributes="0"/>
                                               <EmptySpace max="-2" attributes="0"/>
                                               <Component id="SpecialButton" min="-2" max="-2" attributes="0"/>
                                               <EmptySpace min="-2" pref="4" max="-2" attributes="0"/>
@@ -381,7 +381,7 @@
                               <Group type="103" groupAlignment="3" attributes="0">
                                   <Component id="StandardButton" alignment="3" min="-2" max="-2" attributes="0"/>
                                   <Component id="DefaultButton" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  <Component id="MovingButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="UKOOAButton" alignment="3" min="-2" max="-2" attributes="0"/>
                                   <Component id="printtoggle" alignment="3" min="-2" max="-2" attributes="0"/>
                                   <Component id="SpecialButton" alignment="3" min="-2" max="-2" attributes="0"/>
                                   <Component id="loadfile" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -585,14 +585,17 @@
                     </Property>
                   </Properties>
                 </Component>
-                <Component class="javax.swing.JButton" name="MovingButton">
+                <Component class="javax.swing.JButton" name="UKOOAButton">
                   <Properties>
                     <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                      <ResourceString bundle="com/cgg/arielgeometry/editor/Bundle.properties" key="ArielGeometryEditorTopComponent.MovingButton.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                      <ResourceString bundle="com/cgg/arielgeometry/editor/Bundle.properties" key="ArielGeometryEditorTopComponent.UKOOAButton.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                    </Property>
+                    <Property name="actionCommand" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+                      <ResourceString bundle="com/cgg/arielgeometry/editor/Bundle.properties" key="ArielGeometryEditorTopComponent.UKOOAButton.actionCommand" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                     </Property>
                   </Properties>
                   <Events>
-                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="MovingButtonActionPerformed"/>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="UKOOAButtonActionPerformed"/>
                   </Events>
                 </Component>
                 <Component class="javax.swing.JLabel" name="jLabel6">
