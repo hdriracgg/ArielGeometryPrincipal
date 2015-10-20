@@ -144,6 +144,9 @@ public final class ArielGeometryEditorTopComponent extends TopComponent {
         jLabel27 = new javax.swing.JLabel();
         shortoffset = new javax.swing.JTextField();
         backgroundImage = new javax.swing.JCheckBox();
+        fixedcoveragescale = new javax.swing.JCheckBox();
+        maximumcoverage = new javax.swing.JTextField();
+        jLabel28 = new javax.swing.JLabel();
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel26, org.openide.util.NbBundle.getMessage(ArielGeometryEditorTopComponent.class, "ArielGeometryEditorTopComponent.jLabel26.text")); // NOI18N
 
@@ -358,6 +361,12 @@ public final class ArielGeometryEditorTopComponent extends TopComponent {
         backgroundImage.setSelected(true);
         org.openide.awt.Mnemonics.setLocalizedText(backgroundImage, org.openide.util.NbBundle.getMessage(ArielGeometryEditorTopComponent.class, "ArielGeometryEditorTopComponent.backgroundImage.text")); // NOI18N
 
+        org.openide.awt.Mnemonics.setLocalizedText(fixedcoveragescale, org.openide.util.NbBundle.getMessage(ArielGeometryEditorTopComponent.class, "ArielGeometryEditorTopComponent.fixedcoveragescale.text")); // NOI18N
+
+        maximumcoverage.setText(org.openide.util.NbBundle.getMessage(ArielGeometryEditorTopComponent.class, "ArielGeometryEditorTopComponent.maximumcoverage.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel28, org.openide.util.NbBundle.getMessage(ArielGeometryEditorTopComponent.class, "ArielGeometryEditorTopComponent.jLabel28.text")); // NOI18N
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -365,9 +374,15 @@ public final class ArielGeometryEditorTopComponent extends TopComponent {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(fixedcoveragescale)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(maximumcoverage, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel28))
                     .addComponent(jLabel27)
                     .addComponent(backgroundImage))
-                .addContainerGap(443, Short.MAX_VALUE))
+                .addContainerGap(367, Short.MAX_VALUE))
             .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jPanel1Layout.createSequentialGroup()
                     .addContainerGap()
@@ -384,7 +399,7 @@ public final class ArielGeometryEditorTopComponent extends TopComponent {
                                     .addComponent(loadfile)
                                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                     .addComponent(DefaultButton)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 46, Short.MAX_VALUE)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 129, Short.MAX_VALUE)
                                     .addComponent(printtoggle))
                                 .addGroup(jPanel1Layout.createSequentialGroup()
                                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -483,7 +498,12 @@ public final class ArielGeometryEditorTopComponent extends TopComponent {
                 .addComponent(jLabel27)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(backgroundImage)
-                .addContainerGap(404, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(fixedcoveragescale)
+                    .addComponent(maximumcoverage, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel28))
+                .addContainerGap(381, Short.MAX_VALUE))
             .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jPanel1Layout.createSequentialGroup()
                     .addContainerGap()
@@ -596,7 +616,7 @@ public final class ArielGeometryEditorTopComponent extends TopComponent {
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(drecordingtime, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(jLabel20))
-                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 9, Short.MAX_VALUE)
+                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 10, Short.MAX_VALUE)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(StandardButton)
                         .addComponent(DefaultButton)
@@ -676,6 +696,7 @@ public final class ArielGeometryEditorTopComponent extends TopComponent {
     private void rilsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rilsActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_rilsActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton DefaultButton;
     private javax.swing.JButton SpecialButton;
@@ -695,6 +716,7 @@ public final class ArielGeometryEditorTopComponent extends TopComponent {
     private javax.swing.JTextField dsnbs;
     private javax.swing.JTextField dtotaltraces;
     private javax.swing.JTextField dtracedensity;
+    private javax.swing.JCheckBox fixedcoveragescale;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -715,6 +737,7 @@ public final class ArielGeometryEditorTopComponent extends TopComponent {
     private javax.swing.JLabel jLabel25;
     private javax.swing.JLabel jLabel26;
     private javax.swing.JLabel jLabel27;
+    private javax.swing.JLabel jLabel28;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
@@ -729,6 +752,7 @@ public final class ArielGeometryEditorTopComponent extends TopComponent {
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JButton loadfile;
+    private javax.swing.JTextField maximumcoverage;
     private javax.swing.JTextField maxoffset;
     private javax.swing.JCheckBox printtoggle;
     private javax.swing.JTextField rcls;
@@ -788,6 +812,8 @@ public final class ArielGeometryEditorTopComponent extends TopComponent {
         agm.rss = new Float(rss.getText());
         agm.shortoffset = new Float(shortoffset.getText());
         agm.backgroundimagedisplayed = backgroundImage.isSelected();
+        agm.usercontrolledcoveragescale = fixedcoveragescale.isSelected();
+        agm.usermaxcoverage = Integer.parseInt(maximumcoverage.getText());
     }
 
     private void updatecalculatedvalues() {

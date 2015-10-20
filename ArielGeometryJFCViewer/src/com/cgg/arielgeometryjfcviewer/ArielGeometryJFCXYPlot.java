@@ -230,6 +230,9 @@ public class ArielGeometryJFCXYPlot extends JPanel {
                 }
             }
         }
+        if(agm.usercontrolledcoveragescale) {
+            max = agm.usermaxcoverage;
+        }
         chartPanel = displayPlot(data, title, "Bins", max, true, 2, agm.getBXS(), agm.getBYS(), "Coverage");
         chartPanel.addChartMouseListener(new JFCXYBinPlotMouseListener());
     }

@@ -35,6 +35,8 @@ public abstract class AbstractGeometryModel {
     public float maxoffset; // Maximum offset used in bin metric calculation
     public float shortoffset; // Maximum offset for the short offset coverage map
     public boolean backgroundimagedisplayed;
+    public boolean usercontrolledcoveragescale;
+    public int usermaxcoverage;
     
     // calculated values for receivers
     public int rnbn;            // Receiver NumBer of Nodes (per shot)
