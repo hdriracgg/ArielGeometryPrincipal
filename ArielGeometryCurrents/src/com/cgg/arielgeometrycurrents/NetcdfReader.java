@@ -91,10 +91,10 @@ public class NetcdfReader {
 
         Array dxtarray = dxt.read();
         float[] dxt1d = (float[]) dxtarray.copyTo1DJavaArray();
-        gridxval = (float) (dxt1d[0] / 100.0f);
+        gridxval = (dxt1d[0] / 100.0f);
         Array dytarray = dyt.read();
         float[] dyt1d = (float[]) dytarray.copyTo1DJavaArray();
-        gridyval = (float) (dyt1d[0] / 100.0f);
+        gridyval = (dyt1d[0] / 100.0f);
         System.out.println("gridxval=" + gridxval + " gridyval=" + gridyval);
 
         // outlev
@@ -149,8 +149,8 @@ public class NetcdfReader {
         float result[];
         Random r = new Random();
         for (int i = 0; i < nbreads; i++) {
-            lats[i] = 27.359522f + (float) (r.nextFloat() * (27.39573f - 27.359522f));
-            lons[i] = 35.43578f + (float) (r.nextFloat() * (35.476562f - 35.43578f));
+            lats[i] = 27.359522f + (r.nextFloat() * (27.39573f - 27.359522f));
+            lons[i] = 35.43578f + (r.nextFloat() * (35.476562f - 35.43578f));
             times[i] = 42000.0f * 0.5f;
             depths[i] = 140.0f * r.nextFloat();
         }
@@ -226,8 +226,9 @@ public class NetcdfReader {
     int getdepthindex(float depth) {
         int d = (int) (depth * -1.0f);
         for (int i = 0; i < deptharray.length; i++) {
-            if (d < deptharray[i]);
-            return i;
+            if (d < deptharray[i]) {
+                return i;
+            }
         }
         System.out.println("Out of depth range " + depth);
         return -1;
@@ -235,10 +236,11 @@ public class NetcdfReader {
 
     // get time index from time
     int gettimeindex(int time) {
-        int t = (int) time;
+        int t = time;
         for (int i = 0; i < timearray.length; i++) {
-            if (t > timearray[i]);
-            return i;
+            if (t > timearray[i]) {
+                return i;
+            }
         }
         return -1;
     }

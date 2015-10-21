@@ -46,6 +46,7 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
 
     ArielGeometryCurrentsTopComponent agctc;
     NetcdfFile ncFile = null;
+    MetOceanModel mom = null;
     int coordval;       // coordinate flag 
     // 0 = tangent plane, 1 = unrotated spherical grid, 3 = rotated spherical grid.
     int nxval;          // number of grid points in x direction
@@ -329,13 +330,16 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
             setcalibrationpoint(e.getX(), e.getY());
         }
         else {
-            if (e.getButton() == MouseEvent.BUTTON1) {
+            if (e.getButton() == MouseEvent.BUTTON1 && mom == null) {
                 try {
-                    buildtrajectory(e.getX(), e.getY());
+                    buildnetcdftrajectory(e.getX(), e.getY());
                 }
                 catch (IOException | InvalidRangeException ex) {
                     Exceptions.printStackTrace(ex);
                 }
+            }
+            if(e.getButton() == MouseEvent.BUTTON1 && mom != null) {
+                buildmomtrajectory(e.getX(), e.getY());
             }
         }
         repaint();
@@ -544,7 +548,7 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
         return y * m2deg - 0.28087525d;
     }
 
-    private void buildtrajectory(int x, int y) throws IOException, InvalidRangeException {
+    private void buildnetcdftrajectory(int x, int y) throws IOException, InvalidRangeException {
 
         if (trajectoryList == null) {
             trajectoryList = new ArrayList<>();
@@ -579,6 +583,35 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
         }
     }
 
+    private void buildmomtrajectory(int x, int y) {
+
+        if (trajectoryList == null) {
+            trajectoryList = new ArrayList<>();
+        }
+
+        Trajectory ct = new Trajectory();
+        trajectoryList.add(ct);
+
+        ct.addPoint(x, y);
+
+        int startx = ct.realx;
+        int starty = ct.realy;
+        int previousx = startx;
+        int previousy = starty;
+        for (int i = 0; i < steps; i++) {
+            System.out.println("previousx=" + previousx + " previousy=" + previousy);
+            int timenow = starttime + (int) (i * timestep);
+            float[] current = mom.findclosest(previousx, previousy).current;
+            System.out.println("Current = " + current[0] + "," + current[1]);
+            int nextx = previousx + (int) (current[0] * timestep);
+            int nexty = previousy + (int) (current[1] * timestep);
+            ct.addrealPoint(nextx, nexty);
+            previousx = nextx;
+            previousy = nexty;
+            System.out.println("nextx=" + nextx + " nexty=" + nexty);
+        }
+    }
+    
     private float calculatespeed(int x, int y, int newx, int newy, float t) {
         double distance = Math.sqrt(Math.pow(newx - x, 2) + Math.pow(newy - y, 2));
         return (float) distance / t;
@@ -652,8 +685,8 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
     }
 
     private void loadMO() {
-//        MetOceanModel mom = new MetOceanModel();
-        TideModel tm = new TideModel();
-        agctc.updateTideModel(tm);
+        mom = new MetOceanModel();
+//        TideModel tm = new TideModel();
+//        agctc.updateTideModel(tm);
     }
 }

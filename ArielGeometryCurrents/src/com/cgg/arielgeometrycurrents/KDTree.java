@@ -6,10 +6,6 @@ package com.cgg.arielgeometrycurrents;
 
 //This is a java program to find nearest neighbor using KD Tree implementation
 //http://www.sanfoundry.com/java-program-find-nearest-neighbour-using-k-d-tree-search/
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 
 class KDTree {
 

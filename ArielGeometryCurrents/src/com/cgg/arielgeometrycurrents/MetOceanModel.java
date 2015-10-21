@@ -76,6 +76,27 @@ public class MetOceanModel {
             mintime = t;
         }
     }
+    
+    public MORecord findclosest(int x, int y) {
+        MORecord result = null;
+        MORecord r;
+        float min = Float.MAX_VALUE;
+        for(String buoy : buoyMap.keySet()) {
+            for(Date d : buoyMap.get(buoy).keySet()) {
+                r = buoyMap.get(buoy).get(d);
+                float distance = getdistance(r, x, y);
+                if(distance < min) {
+                    min = distance;
+                    result = r;
+                }
+            }
+        }
+        return(result);
+    }
+    
+    private float getdistance(MORecord r, int x, int y) {
+        return (float)Math.hypot(r.position.x - x, r.position.y - y);
+    }
 
     public class MORecord {
 
