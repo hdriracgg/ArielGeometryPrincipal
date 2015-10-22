@@ -47,6 +47,7 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
     ArielGeometryCurrentsTopComponent agctc;
     NetcdfFile ncFile = null;
     MetOceanModel mom = null;
+    NetcdfReader netcdfreader = null;
     int coordval;       // coordinate flag 
     // 0 = tangent plane, 1 = unrotated spherical grid, 3 = rotated spherical grid.
     int nxval;          // number of grid points in x direction
@@ -106,7 +107,6 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
     Color defaultfg;
     Color defaultbg;
     Stroke widestroke;
-    NetcdfReader netcdfreader;
     float timestep = 3600.0f;
     float depth = 50.0f;
     int steps = 10;
@@ -118,7 +118,6 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
         addMouseListener(this);
         addMouseWheelListener(this);
 
-        netcdfreader = new NetcdfReader();
 
         widestroke = new BasicStroke(2.5f);
         try {
@@ -155,14 +154,18 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
             @Override
             public void actionPerformed(ActionEvent e) {
                 loadMO();
-//                writingmarinatrajectories = true;
-//                repaint();
-////                writemarinatrajectories();
-//                writingmarinatrajectories = false;
-//                repaint();
             }
         });
         add(jb4);
+
+        JButton jb4a = new JButton("Load netcdf");
+        jb4a.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                loadnetcdf();
+            }
+        });
+        add(jb4a);
 
         JLabel jl1 = new JLabel("Start time in s = ");
         jl1.setOpaque(true);
@@ -330,15 +333,17 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
             setcalibrationpoint(e.getX(), e.getY());
         }
         else {
-            if (e.getButton() == MouseEvent.BUTTON1 && mom == null) {
+            if (e.getButton() == MouseEvent.BUTTON1 && netcdfreader != null) {
                 try {
+                    System.out.println("Build netcdf trajectory");
                     buildnetcdftrajectory(e.getX(), e.getY());
                 }
                 catch (IOException | InvalidRangeException ex) {
                     Exceptions.printStackTrace(ex);
                 }
             }
-            if(e.getButton() == MouseEvent.BUTTON1 && mom != null) {
+            if (e.getButton() == MouseEvent.BUTTON1 && mom != null) {
+                System.out.println("Build MetOceanModel trajectory");
                 buildmomtrajectory(e.getX(), e.getY());
             }
         }
@@ -601,7 +606,7 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
         for (int i = 0; i < steps; i++) {
             System.out.println("previousx=" + previousx + " previousy=" + previousy);
             int timenow = starttime + (int) (i * timestep);
-            float[] current = mom.findclosest(previousx, previousy).current;
+            float[] current = mom.findclosest(previousx, previousy, timenow).current;
             System.out.println("Current = " + current[0] + "," + current[1]);
             int nextx = previousx + (int) (current[0] * timestep);
             int nexty = previousy + (int) (current[1] * timestep);
@@ -611,7 +616,7 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
             System.out.println("nextx=" + nextx + " nexty=" + nexty);
         }
     }
-    
+
     private float calculatespeed(int x, int y, int newx, int newy, float t) {
         double distance = Math.sqrt(Math.pow(newx - x, 2) + Math.pow(newy - y, 2));
         return (float) distance / t;
@@ -686,7 +691,18 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
 
     private void loadMO() {
         mom = new MetOceanModel();
+        netcdfreader = null;
 //        TideModel tm = new TideModel();
 //        agctc.updateTideModel(tm);
+    }
+
+    private void loadnetcdf() {
+        try {
+            netcdfreader = new NetcdfReader();
+            mom = null;
+        }
+        catch (IOException | InvalidRangeException ex) {
+            Exceptions.printStackTrace(ex);
+        }
     }
 }

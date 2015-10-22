@@ -23,6 +23,8 @@ public class MetOceanModel {
     public long maxtime = Long.MIN_VALUE;
     public long mintime = Long.MAX_VALUE;
     public long timerange = 0;
+    // converts seconds to metres in distance calculation
+    private float timefactor = 0.000001f;
 
     public MetOceanModel() {
         buoyMap = new HashMap<>();
@@ -76,26 +78,36 @@ public class MetOceanModel {
             mintime = t;
         }
     }
-    
-    public MORecord findclosest(int x, int y) {
+
+    public MORecord findclosest(int x, int y, int t) {
         MORecord result = null;
         MORecord r;
         float min = Float.MAX_VALUE;
-        for(String buoy : buoyMap.keySet()) {
-            for(Date d : buoyMap.get(buoy).keySet()) {
+        for (String buoy : buoyMap.keySet()) {
+            for (Date d : buoyMap.get(buoy).keySet()) {
                 r = buoyMap.get(buoy).get(d);
-                float distance = getdistance(r, x, y);
-                if(distance < min) {
+                float distance = getdistance(r, x, y, t);
+                if (distance < min) {
                     min = distance;
                     result = r;
                 }
             }
         }
-        return(result);
+        return (result);
     }
-    
-    private float getdistance(MORecord r, int x, int y) {
-        return (float)Math.hypot(r.position.x - x, r.position.y - y);
+
+    private float getdistance(MORecord r, int x, int y, int t) {
+        float distance = (float) Math.hypot(r.position.x - x, r.position.y - y);
+        long relativetime = t + mintime;
+        int timediff = (int) (relativetime - r.javadate.getTime());
+        // only look in MetOcean past
+        if (timediff < 0) {
+            return Float.MAX_VALUE;
+        }
+        float timedistance = timediff * timefactor;
+        float result = (float) Math.hypot(distance, timedistance);
+
+        return result;
     }
 
     public class MORecord {
