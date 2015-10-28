@@ -23,6 +23,9 @@ public class MetOceanModel {
     public Map<String, Map<Date, MORecord>> buoyMap;
     public Date maxdate = new Date(Long.MIN_VALUE);
     public Date mindate = new Date(Long.MAX_VALUE);
+    public long mintime;
+    public long maxtime;
+    public long timerange;
     // converts seconds to metres in distance calculation
     private float timefactor = 0.000000001f;
     // converts depth to pseudo metres in distance calculation
@@ -52,6 +55,7 @@ public class MetOceanModel {
             Point position = new Point((int) mor.x, (int) mor.y);
             record.position = position;
             String buoyname = mor.buoyname;
+            record.buoy = buoyname;
             if (buoyMap.containsKey(buoyname)) {
                 if (buoyMap.get(buoyname).containsKey(javadate)) {
                     duplicates++;
@@ -67,22 +71,31 @@ public class MetOceanModel {
                 buoyMap.put(buoyname, m);
             }
         }
+        mintime = mindate.getTime();
+        maxtime = maxdate.getTime();
+        timerange = maxtime - mintime;
         System.out.printf("%d records of which %d duplicates read from file %s\n", records, duplicates, file.getAbsolutePath());
     }
 
     private void setminmax(Date d) {
-        if(d.before(mindate)) {
+        if (d.before(mindate)) {
             mindate = d;
         }
-        if(d.after(maxdate)) {
+        if (d.after(maxdate)) {
             maxdate = d;
         }
     }
 
-    public MORecord findclosest(int x, int y, int t, int depth) {
+    // t is MetOceanModel time
+    // negative means select only in the future
+    // positive means select only in the past
+    public MORecord findclosest(int x, int y, long t, float depth) {
+        System.out.printf("findclosest x=%d y=%d t=%d depth=%f\n", x, y, t, depth);
         MORecord result = null;
         MORecord r;
         float min = Float.MAX_VALUE;
+        String buoyfound = "";
+        Date datefound = null;
         for (String buoy : buoyMap.keySet()) {
             for (Date d : buoyMap.get(buoy).keySet()) {
                 r = buoyMap.get(buoy).get(d);
@@ -90,22 +103,13 @@ public class MetOceanModel {
                 if (distance < min) {
                     min = distance;
                     result = r;
+                    buoyfound = buoy;
+                    datefound = d;
                 }
             }
         }
+        System.out.printf("buoyfound=%s timefound=%d\n", buoyfound, datefound.getTime());
         return (result);
-    }
-
-    public String getname(MORecord r) {
-        String result = "unknown";
-        for (String buoy : buoyMap.keySet()) {
-            for (Date d : buoyMap.get(buoy).keySet()) {
-                if (buoyMap.get(buoy).get(d) == r) {
-                    result = buoy;
-                }
-            }
-        }
-        return result;
     }
 
     public Map<Date, MORecord> getrecordsbybuoy(String name) {
@@ -116,12 +120,12 @@ public class MetOceanModel {
         return new Date(timefromstart + mindate.getTime());
     }
 
-    private float getpseudodistance(MORecord r, int x, int y, int t, int depth) {
+    private float getpseudodistance(MORecord r, int x, int y, long t, float depth) {
 
         float xdistance = r.position.x - x;
         float ydistance = r.position.y - y;
         float result = (float) Math.hypot(xdistance, ydistance);
-        
+
         boolean future = false;
         if (t < 0) {
             future = true;
@@ -129,9 +133,8 @@ public class MetOceanModel {
         }
 
         // process time pseudodistance
-        Date momdate = getmomDate(t);
-        long timediff = r.javadate.getTime() - momdate.getTime();
-        timediff = timediff/1000;  // convert to seconds
+        long timediff = r.javadate.getTime() - t;
+        timediff = timediff / 1000;  // convert to seconds
         // only look in MetOcean past
         if (!future && timediff > 0) {
             return Float.MAX_VALUE;
@@ -154,6 +157,7 @@ public class MetOceanModel {
 
     public class MORecord {
 
+        public String buoy;
         public Date javadate;
         public float depth;
         public float[] current;
@@ -169,7 +173,7 @@ public class MetOceanModel {
             return distance / timedifference;
         }
 
-        public long gettimedifference(MORecord b) {
+        public long getTimeDifference(MORecord b) {
             if (b == null) {
                 return 0;
             }
@@ -178,8 +182,35 @@ public class MetOceanModel {
             }
         }
 
+        public float getPseudoDistance(MORecord b) {
+            return getpseudodistance(b, position.x, position.y, javadate.getTime(), depth);
+        }
+
+        public double getDistance(MORecord b) {
+            double x = b.position.x - position.x;
+            double y = b.position.y - position.y;
+            return Math.hypot(x, y);
+        }
+
+        public double getDistance(int otherx, int othery) {
+            double x = otherx - position.x;
+            double y = othery - position.y;
+            return Math.hypot(x, y);
+        }
+
+        public String getDifference(MORecord b) {
+            if(b == null) {
+                return "Difference with null\n";
+            }
+            long t = getTimeDifference(b);
+            float pd = getPseudoDistance(b);
+            double d = getDistance(b);
+            return String.format("Time difference=%d Pseudodistance=%g Distance=%g\n", t, pd, d);
+        }
+
         public String toString() {
             StringBuilder sb = new StringBuilder();
+            sb.append(String.format("buoy name = %s\n", buoy));
             sb.append(String.format("javatime = %d\n", javadate.getTime()));
             sb.append(String.format("depth    = %f\n", depth));
             sb.append(String.format("current  = %05.4f,%05.4f\n", current[0], current[1]));

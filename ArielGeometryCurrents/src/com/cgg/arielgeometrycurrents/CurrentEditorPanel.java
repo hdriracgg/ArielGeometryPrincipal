@@ -457,7 +457,7 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
             idx = t.speeds.size() - 1;
         }
         float sp = 100.0f * t.speeds.get(idx);
-        return String.format("%.2fcm/s", sp);
+        return String.format("%3.1fcm/s", sp);
     }
 
     private Point screen2real(int x, int y) {
@@ -640,23 +640,36 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
         Point startpoint = screen2real(x, y);
 
         // find the nearest buoy in the future
-        MetOceanModel.MORecord mor = mom.findclosest(startpoint.x, startpoint.y, starttime * -1000, defaultdepth);
-        String buoy = mom.getname(mor);
-        System.out.println("buoy = " + buoy);
-        System.out.println(mor);
+        Date startdate = mom.getmomDate(starttime * 1000);
+        MetOceanModel.MORecord mor = mom.findclosest(startpoint.x, startpoint.y, startdate.getTime() * -1, defaultdepth);
+        String buoy = mor.buoy;
+//        System.out.println("Closest:\n" + mor);
+//        System.out.printf("Distance of closest=%g\n", mor.getDistance(startpoint.x, startpoint.y));
+//        System.out.printf("Time difference of closest=%d\n", mor.javadate.getTime() - startdate.getTime());
+        long timefound = mor.javadate.getTime();
 
         Map<Date, MetOceanModel.MORecord> recordmap = mom.getrecordsbybuoy(buoy);
+        System.out.println("map size " + recordmap.size());
 
-        Date startdate = new Date(mom.getmomtime(starttime*1000));
         MetOceanModel.MORecord nextr;
         MetOceanModel.MORecord previousr = null;
         int pointsadded = 0;
+        boolean found = false;
         for (Date d : recordmap.keySet()) {
-            if (d.after(startdate)) {
+//            System.out.printf("Distance=%g\n", mor.getDistance(recordmap.get(d)));
+//            System.out.println("Buoy = " + recordmap.get(d).buoy);
+//            System.out.printf("buoy=%s time=%d\n", buoy, recordmap.get(d).javadate.getTime());
+            if (recordmap.get(d).javadate.getTime() == timefound) {
+//                System.out.println("Found!");
+                found = true;
+            }
+            if (d.after(startdate) && found) {
+//                System.out.println("After");
                 nextr = recordmap.get(d);
                 // Assume the buoy has been relaunched if time difference is more than 30 minutes
-                System.out.println("nextr \n" + nextr);
-                if (nextr.gettimedifference(previousr) > (30 * 60 * 1000)) {
+//                System.out.println("After\n");
+//                System.out.println(nextr.getDifference(previousr));
+                if (nextr.getTimeDifference(previousr) > (30 * 60 * 1000)) {
                     break;
                 }
                 ct.addrealPoint(previousr, nextr);
@@ -669,7 +682,7 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
             trajectoryList.add(ct);
         }
         else {
-            System.out.println("No points added");
+            System.out.println("No trajectory added");
         }
     }
 
@@ -732,7 +745,7 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
         // so its index is 1 behind the Point index
         void addSpeed(Point thisPoint, Point previousPoint) {
             float aspeed = calculatespeed(thisPoint.x, thisPoint.y, previousPoint.x, previousPoint.y, timestep);
-            speeds.add(aspeed);
+            speeds.add(aspeed * 100);
         }
 
         // Time starts at zero
@@ -746,15 +759,34 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
     }
 
     private class BuoyTrajectory extends Trajectory {
+        
+        long timestep;
 
         void addrealPoint(MetOceanModel.MORecord previous, MetOceanModel.MORecord next) {
             if (previous != null) {
-                timestep = next.javadate.getTime() - previous.javadate.getTime();
+                timestep = (next.javadate.getTime() - previous.javadate.getTime()) / 1000;
             }
             else {
                 timestep = 0;
             }
             addrealPoint(next.position.x, next.position.y);
+        }
+        
+        @Override
+         void addrealPoint(int x, int y) {
+            Point realPoint = new Point(x, y);
+            realPoints.add(realPoint);
+            Point transformedPoint = real2transformed(realPoint);
+            transformedPoints.add(transformedPoint);
+            Point screenPoint = transformed2screen(transformedPoint);
+            screenPoints.add(screenPoint);
+            realx = realPoint.x;
+            realy = realPoint.y;
+            int idx = realPoints.size() - 1;
+            if (idx > 0) {
+                addSpeed(realPoints.get(idx), realPoints.get(idx - 1));
+                addTime(timestep);
+            }
         }
 
         // speed is the speed between present point and next point
@@ -763,16 +795,6 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
         void addSpeed(Point thisPoint, Point previousPoint) {
             float aspeed = calculatespeed(thisPoint.x, thisPoint.y, previousPoint.x, previousPoint.y, timestep);
             speeds.add(aspeed);
-        }
-
-        // Time starts at zero
-        @Override
-        void addTime(float t) {
-            if (times.isEmpty()) {
-                times.add(0.0f);
-            }
-            int idx = times.size() - 1;
-            times.add(times.get(idx) + t);
         }
     }
 
