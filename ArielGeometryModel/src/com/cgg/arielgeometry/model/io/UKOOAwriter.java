@@ -11,8 +11,12 @@ import com.cgg.arielgeometry.model.ShotModel;
 import com.cgg.arielgeometry.model.types.XYLocation;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -31,6 +35,20 @@ public class UKOOAwriter {
         this.agm = agm;
         this.asm = agm.getasm();
         this.arm = agm.getarm();
+    }
+
+    public UKOOAwriter(String directory) {
+        Date today = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd");
+        String date = sdf.format(today);
+        filename = directory + "_source_waypoints_" + date;
+        System.out.println("Attempting to write to "+filename);
+        try {
+            ps = new PrintStream(filename);
+        }
+        catch (FileNotFoundException ex) {
+            System.out.println(directory + " not found");
+        }
     }
 
     public void write() {
@@ -55,9 +73,13 @@ public class UKOOAwriter {
     }
 
     void writeshot(Integer shot, XYLocation location) {
-//        System.out.println("Write shot " + shot + " " + location.x + " " + location.y);
         ps.printf("S                  %6d                     %9.1f%9.1f 0.0\n",
                 shot, location.x, location.y);
+    }
+
+    public void writeshot(Integer shot, double x, double y) {
+        ps.printf("S                  %6d                     %9.1f%9.1f 0.0\n",
+                shot, x, y);
     }
 
     void writereceivers(List<XYLocation> receivers) {
@@ -84,8 +106,13 @@ public class UKOOAwriter {
             }
         }
     }
+    
+    public void close() {
+        ps.close();
+        System.out.println("UKOOA written to "+filename);
+    }
 
-    void writeheader() {
+    public void writeheader() {
         ps.printf("%-80s\n", "H0300CLIENT                     SAUDI ARAMCO");
         ps.printf("%-80s\n", "H0400GEOPHYSICAL CONTRACTOR     ARGAS");
         ps.printf("%-80s\n", "H0500POSITIONING CONTRACTOR     ????");

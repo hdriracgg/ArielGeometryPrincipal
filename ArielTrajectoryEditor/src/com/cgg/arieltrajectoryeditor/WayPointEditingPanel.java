@@ -4,6 +4,7 @@
  */
 package com.cgg.arieltrajectoryeditor;
 
+import com.cgg.arielgeometry.model.io.UKOOAwriter;
 import com.cgg.arielgeometrycurrents.MetOceanReader;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -544,6 +545,23 @@ public class WayPointEditingPanel extends JPanel implements MouseListener, Mouse
         return pointList;
     }
 
+    private void writeshots2UKOOA(String directory) {
+        if (pointList.isEmpty()) {
+            System.out.println("No points clicked yet");
+            return;
+        }
+        UKOOAwriter writer = new UKOOAwriter(directory);
+        writer.writeheader();
+        int shotnb = 1;
+        Point realPoint;
+        for (Point p : pointList) {
+            realPoint = screen2real(p);
+            System.out.println("Point = " + realPoint);
+            writer.writeshot(shotnb++, (double) realPoint.x, (double) realPoint.y);
+        }
+        writer.close();
+    }
+
     private void writemarinatrajectories() {
         // Choose and create directory if needed
         JFileChooser jfc = new JFileChooser("C:\\Users\\jgrimsdale\\Desktop");
@@ -632,6 +650,8 @@ public class WayPointEditingPanel extends JPanel implements MouseListener, Mouse
             printpoints();
         }
 
+        writeshots2UKOOA(outputdirectory);
+
         // Prepare list of real points
         List<Point> realpointList = new ArrayList<>();
         for (Point p : pointList) {
@@ -712,7 +732,7 @@ public class WayPointEditingPanel extends JPanel implements MouseListener, Mouse
             speed = (int) (100.0f * Math.hypot(mor.vx, mor.vy));
             addpoint(p.x, p.y);
         }
-        if(startdate != null) {
+        if (startdate != null) {
             starttime = (startdate.getTime() / 1000) - 1440000000;
         }
         jtf1.setText(Long.toString(starttime));
