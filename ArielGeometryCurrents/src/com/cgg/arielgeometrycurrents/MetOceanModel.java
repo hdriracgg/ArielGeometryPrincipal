@@ -106,6 +106,10 @@ public class MetOceanModel {
         return (result);
     }
 
+    float[] getvv(int x, int y, long t, float depth) {
+        return findclosest(x, y, t, depth).current;
+    }
+    
     public Map<Date, MORecord> getrecordsbybuoy(String name) {
         return buoyMap.get(name);
     }
