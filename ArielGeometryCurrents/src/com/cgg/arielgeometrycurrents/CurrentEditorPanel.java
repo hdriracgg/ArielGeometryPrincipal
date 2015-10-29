@@ -448,7 +448,12 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
 
     private String gettimefromp(Point p, Trajectory t) {
         int idx = t.transformedPoints.indexOf(p);
-        return String.format("%.0fs", t.times.get(idx));
+        float flt = t.times.get(idx);
+        int timeinsecs = (int) flt;
+        int hours = timeinsecs / 3600;
+        int minutes = (timeinsecs % 3600) / 60;
+        int secs = timeinsecs % 60;
+        return String.format("%d:%d:%d", hours, minutes, secs);
     }
 
     private String getspeedfromp(Point p, Trajectory t) {
@@ -599,6 +604,7 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
         }
     }
 
+    // build a predicted trajectory based on data from the past
     private void buildmomtrajectory(int x, int y) {
 
         if (trajectoryList == null) {
@@ -616,8 +622,9 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
         int previousy = starty;
         for (int i = 0; i < steps; i++) {
             System.out.println("previousx=" + previousx + " previousy=" + previousy);
-            int timenow = (starttime + (int) (i * timestep)) * 1000;
-            float[] current = mom.findclosest(previousx, previousy, timenow, defaultdepth).current;
+            long timenow = mom.getmomDate((starttime + (int) (i * timestep)) * 1000).getTime();
+
+            float[] current = getcurrentprediction(previousx, previousy, timenow, defaultdepth);
             System.out.println("Current = " + current[0] + "," + current[1]);
             int nextx = previousx + (int) (current[0] * timestep);
             int nexty = previousy + (int) (current[1] * timestep);
@@ -628,6 +635,12 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
         }
     }
 
+    private float[] getcurrentprediction(int x, int y, long t, int depth) {
+        float[] current = mom.findclosest(x, y, t, depth).current;
+        return current;
+    }
+
+    // build a trajectory corresponding to the closest buoy found in the future
     private void buildbuoytrajectory(int x, int y) {
         if (mom == null) {
             System.out.println("No MO Model is loaded");
@@ -643,9 +656,9 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
         Date startdate = mom.getmomDate(starttime * 1000);
         MetOceanModel.MORecord mor = mom.findclosest(startpoint.x, startpoint.y, startdate.getTime() * -1, defaultdepth);
         String buoy = mor.buoy;
-//        System.out.println("Closest:\n" + mor);
-//        System.out.printf("Distance of closest=%g\n", mor.getDistance(startpoint.x, startpoint.y));
-//        System.out.printf("Time difference of closest=%d\n", mor.javadate.getTime() - startdate.getTime());
+        System.out.println("Closest:\n" + mor);
+        System.out.printf("Distance of closest=%g\n", mor.getDistance(startpoint.x, startpoint.y));
+        System.out.printf("Time difference of closest=%d\n", mor.javadate.getTime() - startdate.getTime());
         long timefound = mor.javadate.getTime();
 
         Map<Date, MetOceanModel.MORecord> recordmap = mom.getrecordsbybuoy(buoy);
@@ -745,7 +758,7 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
         // so its index is 1 behind the Point index
         void addSpeed(Point thisPoint, Point previousPoint) {
             float aspeed = calculatespeed(thisPoint.x, thisPoint.y, previousPoint.x, previousPoint.y, timestep);
-            speeds.add(aspeed * 100);
+            speeds.add(aspeed);
         }
 
         // Time starts at zero
@@ -759,7 +772,7 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
     }
 
     private class BuoyTrajectory extends Trajectory {
-        
+
         long timestep;
 
         void addrealPoint(MetOceanModel.MORecord previous, MetOceanModel.MORecord next) {
@@ -771,9 +784,9 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
             }
             addrealPoint(next.position.x, next.position.y);
         }
-        
+
         @Override
-         void addrealPoint(int x, int y) {
+        void addrealPoint(int x, int y) {
             Point realPoint = new Point(x, y);
             realPoints.add(realPoint);
             Point transformedPoint = real2transformed(realPoint);

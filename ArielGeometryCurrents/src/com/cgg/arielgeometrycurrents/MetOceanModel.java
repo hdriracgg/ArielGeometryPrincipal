@@ -90,12 +90,9 @@ public class MetOceanModel {
     // negative means select only in the future
     // positive means select only in the past
     public MORecord findclosest(int x, int y, long t, float depth) {
-        System.out.printf("findclosest x=%d y=%d t=%d depth=%f\n", x, y, t, depth);
         MORecord result = null;
         MORecord r;
         float min = Float.MAX_VALUE;
-        String buoyfound = "";
-        Date datefound = null;
         for (String buoy : buoyMap.keySet()) {
             for (Date d : buoyMap.get(buoy).keySet()) {
                 r = buoyMap.get(buoy).get(d);
@@ -103,12 +100,9 @@ public class MetOceanModel {
                 if (distance < min) {
                     min = distance;
                     result = r;
-                    buoyfound = buoy;
-                    datefound = d;
                 }
             }
         }
-        System.out.printf("buoyfound=%s timefound=%d\n", buoyfound, datefound.getTime());
         return (result);
     }
 

@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+OpenIDE-Module: com.cgg.commonsmath
+OpenIDE-Module-Localizing-Bundle: com/cgg/commonsmath/Bundle.properties
+OpenIDE-Module-Specification-Version: 1.0
+
