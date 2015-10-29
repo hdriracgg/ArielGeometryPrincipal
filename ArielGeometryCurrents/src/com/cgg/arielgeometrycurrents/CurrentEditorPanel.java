@@ -36,6 +36,9 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.openide.util.Exceptions;
+import org.openide.windows.IOProvider;
+import org.openide.windows.InputOutput;
+import org.openide.windows.OutputWriter;
 import ucar.ma2.InvalidRangeException;
 import ucar.nc2.NetcdfFile;
 import ucar.nc2.Variable;
@@ -113,6 +116,7 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
     float depth = 50.0f;
     int steps = 10;
     int defaultdepth = 20;
+    OutputWriter output;
 
     public CurrentEditorPanel(ArielGeometryCurrentsTopComponent agctc) throws IOException, InvalidRangeException {
         this.agctc = agctc;
@@ -120,14 +124,14 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
         addMouseMotionListener(this);
         addMouseListener(this);
         addMouseWheelListener(this);
-
+        output = IOProvider.getDefault().getIO("Messages", false).getOut();
 
         widestroke = new BasicStroke(2.5f);
         try {
             background = ImageIO.read(new File("C:\\Users\\jgrimsdale\\Desktop\\Moussafir A0 SURVEY map.png"));
         }
         catch (IOException e) {
-            System.out.println("Cannot open file for background, choose a png in dialog");
+            output.println("Cannot open file for background, choose a png in dialog");
             background = getbackground();
         }
 
@@ -183,7 +187,7 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
             @Override
             public void actionPerformed(ActionEvent e) {
                 starttime = Integer.parseInt(jtf1.getText());
-                System.out.println("Start time changed to " + starttime + " s");
+                output.println("Start time changed to " + starttime + " s");
             }
         });
         add(jtf1);
@@ -201,7 +205,7 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
             @Override
             public void actionPerformed(ActionEvent e) {
                 timestep = Float.parseFloat(jtf2.getText());
-                System.out.println("timestep changed to " + timestep + " s");
+                output.println("timestep changed to " + timestep + " s");
             }
         });
         add(jtf2);
@@ -219,7 +223,7 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
             @Override
             public void actionPerformed(ActionEvent e) {
                 depth = Float.parseFloat(jtf3.getText());
-                System.out.println("depth changed to " + depth + " s");
+                output.println("depth changed to " + depth + " s");
             }
         });
         add(jtf3);
@@ -237,7 +241,7 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
             @Override
             public void actionPerformed(ActionEvent e) {
                 steps = Integer.parseInt(jtf4.getText());
-                System.out.println("steps changed to " + steps);
+                output.println("steps changed to " + steps);
             }
         });
         add(jtf4);
@@ -260,7 +264,7 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
             bi = ImageIO.read(file);
         }
         catch (IOException e) {
-            System.out.println("Cannot open file for background " + file.getAbsolutePath());
+            output.println("Cannot open file for background " + file.getAbsolutePath());
         }
         return bi;
     }
@@ -320,13 +324,13 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
     // Handles the event of a user releasing the mouse button.
     @Override
     public void mouseReleased(MouseEvent e) {
-//        System.out.println("mouseReleased");
+//        output.println("mouseReleased");
     }
 
     // This method is required by MouseListener.
     @Override
     public void mouseMoved(MouseEvent e) {
-//        System.out.println("mouseMoved");
+//        output.println("mouseMoved");
     }
 
     // These methods are required by MouseMotionListener.
@@ -338,7 +342,7 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
         else {
             if (e.getButton() == MouseEvent.BUTTON1 && netcdfreader != null) {
                 try {
-                    System.out.println("Build netcdf trajectory");
+                    output.println("Build netcdf trajectory");
                     buildnetcdftrajectory(e.getX(), e.getY());
                 }
                 catch (IOException | InvalidRangeException ex) {
@@ -346,12 +350,12 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
                 }
             }
             if (e.getButton() == MouseEvent.BUTTON1 && mom != null) {
-                System.out.println("Build MetOceanModel trajectory");
+                output.println("Build MetOceanModel trajectory");
                 buildmomtrajectory(e.getX(), e.getY());
             }
         }
         if (e.getButton() == MouseEvent.BUTTON3 && mom != null) {
-            System.out.println("Get real buoy trajectory");
+            output.println("Get real buoy trajectory");
             buildbuoytrajectory(e.getX(), e.getY());
         }
         repaint();
@@ -359,12 +363,12 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
 
     @Override
     public void mouseExited(MouseEvent e) {
-//        System.out.println("mouseExited");
+//        output.println("mouseExited");
     }
 
     @Override
     public void mouseEntered(MouseEvent e) {
-//        System.out.println("mouseEntered");
+//        output.println("mouseEntered");
     }
 
     @Override
@@ -500,14 +504,14 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
 
     private List<Point> printpoints() {
         if (pointList.isEmpty()) {
-            System.out.println("No points clicked yet");
+            output.println("No points clicked yet");
         }
         for (Point p : pointList) {
-            System.out.println("Point = " + p);
+            output.println("Point = " + p);
         }
         if (!calibrationpointlist.isEmpty()) {
             for (Point p : pointList) {
-                System.out.println("Real point = " + transformed2real(p));
+                output.println("Real point = " + transformed2real(p));
             }
         }
         return pointList;
@@ -538,8 +542,8 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
     }
 
     void setcalibrationpoints(int tlx, int tly, int brx, int bry) {
-        System.out.println(" calib points " + tlx + " " + tly + " " + brx + " " + bry);
-        System.out.println(" points selected " + calibrationpointlist);
+        output.println(" calib points " + tlx + " " + tly + " " + brx + " " + bry);
+        output.println(" points selected " + calibrationpointlist);
         Point tl = calibrationpointlist.get(0);
         Point br = calibrationpointlist.get(1);
         xscale = (float) (brx - tlx) / (float) (br.x - tl.x);
@@ -569,8 +573,13 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
         return y * m2deg - 0.28087525d;
     }
 
+    // build a predicted trajectory based on data from a netcdf file
     private void buildnetcdftrajectory(int x, int y) throws IOException, InvalidRangeException {
-
+        output.println("\nBuild netcdf predicted trajectory:");
+        output.println("Find current at start position, time and depth");
+        output.println("move with the current for timestep seconds\n");
+        output.println("then repeat at new position, time and depth\n");
+        
         if (trajectoryList == null) {
             trajectoryList = new ArrayList<>();
         }
@@ -589,10 +598,10 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
         int previousx = startx;
         int previousy = starty;
         for (int i = 0; i < steps; i++) {
-            System.out.println("previouslon=" + previouslon + " previouslat=" + previouslat);
+            output.println("previouslon=" + previouslon + " previouslat=" + previouslat);
             int timenow = starttime + (int) (i * timestep);
             float[] current = netcdfreader.getvv(previouslon, previouslat, timenow, depth);
-            System.out.println("Current = " + current[0] + "," + current[1]);
+            output.println("Current = " + current[0] + "," + current[1]);
             int nextx = previousx + (int) (current[0] * timestep / 100.0f);
             int nexty = previousy + (int) (current[1] * timestep / 100.0f);
             ct.addrealPoint(nextx, nexty);
@@ -600,12 +609,16 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
             previousy = nexty;
             previouslon = (float) x2lon(nextx);
             previouslat = (float) y2lat(nexty);
-            System.out.println("nextx=" + nextx + " nexty=" + nexty);
+            output.println("nextx=" + nextx + " nexty=" + nexty);
         }
     }
 
     // build a predicted trajectory based on data from the past
     private void buildmomtrajectory(int x, int y) {
+        output.println("\nBuild MetOcean predicted trajectory:");
+        output.println("Find closest buoy in the past and get its current");
+        output.println("move with the current for timestep seconds\n");
+        output.println("then repeat\n");
 
         if (trajectoryList == null) {
             trajectoryList = new ArrayList<>();
@@ -621,31 +634,29 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
         int previousx = startx;
         int previousy = starty;
         for (int i = 0; i < steps; i++) {
-            System.out.println("previousx=" + previousx + " previousy=" + previousy);
+            output.println("previousx=" + previousx + " previousy=" + previousy);
             long timenow = mom.getmomDate((starttime + (int) (i * timestep)) * 1000).getTime();
-
-            float[] current = getcurrentprediction(previousx, previousy, timenow, defaultdepth);
-            System.out.println("Current = " + current[0] + "," + current[1]);
+            float[] current = mom.getvv(previousx, previousy, timenow, defaultdepth);
+            output.println("Current = " + current[0] + "," + current[1]);
             int nextx = previousx + (int) (current[0] * timestep);
             int nexty = previousy + (int) (current[1] * timestep);
             ct.addrealPoint(nextx, nexty);
             previousx = nextx;
             previousy = nexty;
-            System.out.println("nextx=" + nextx + " nexty=" + nexty);
+            output.println("nextx=" + nextx + " nexty=" + nexty);
         }
-    }
-
-    private float[] getcurrentprediction(int x, int y, long t, int depth) {
-        float[] current = mom.findclosest(x, y, t, depth).current;
-        return current;
     }
 
     // build a trajectory corresponding to the closest buoy found in the future
     private void buildbuoytrajectory(int x, int y) {
         if (mom == null) {
-            System.out.println("No MO Model is loaded");
+            output.println("No MO Model is loaded");
             return;
         }
+        output.println("\nBuild buoy trajectory:");
+        output.println("Find closest buoy in the future then follow it");
+        output.println("until there is more than 30 minutes between messages\n");
+
         if (trajectoryList == null) {
             trajectoryList = new ArrayList<>();
         }
@@ -657,32 +668,30 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
         MetOceanModel.MORecord mor = mom.findclosest(startpoint.x, startpoint.y, startdate.getTime() * -1, defaultdepth);
         String buoy = mor.buoy;
         long timefound = mor.javadate.getTime();
-        System.out.println("Closest buoy is:\n" + mor);
-        System.out.printf("Distance of closest=%g\n", mor.getDistance(startpoint.x, startpoint.y));
+        output.println("Closest buoy is:\n" + mor);
+        output.printf("Distance of closest=%.1f metres\n", mor.getDistance(startpoint.x, startpoint.y));
         float hoursdifference = (timefound - startdate.getTime()) / (1000 * 3600);
-        System.out.printf("Time difference of closest=%f\n", hoursdifference);
+        if (hoursdifference > 24.0f) {
+            output.printf("Time difference of closest=%.1f days\n", hoursdifference / 24);
+        }
+        else {
+            output.printf("Time difference of closest=%.1f hours\n", hoursdifference);
+        }
 
         Map<Date, MetOceanModel.MORecord> recordmap = mom.getrecordsbybuoy(buoy);
-        System.out.println("map size " + recordmap.size());
+        output.println("map size " + recordmap.size());
 
         MetOceanModel.MORecord nextr;
         MetOceanModel.MORecord previousr = null;
         int pointsadded = 0;
         boolean found = false;
         for (Date d : recordmap.keySet()) {
-//            System.out.printf("Distance=%g\n", mor.getDistance(recordmap.get(d)));
-//            System.out.println("Buoy = " + recordmap.get(d).buoy);
-//            System.out.printf("buoy=%s time=%d\n", buoy, recordmap.get(d).javadate.getTime());
             if (recordmap.get(d).javadate.getTime() == timefound) {
-//                System.out.println("Found!");
                 found = true;
             }
             if (d.after(startdate) && found) {
-//                System.out.println("After");
                 nextr = recordmap.get(d);
                 // Assume the buoy has been relaunched if time difference is more than 30 minutes
-//                System.out.println("After\n");
-//                System.out.println(nextr.getDifference(previousr));
                 if (nextr.getTimeDifference(previousr) > (30 * 60 * 1000)) {
                     break;
                 }
@@ -692,11 +701,11 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
             }
         }
         if (pointsadded > 1) {
-            System.out.println(pointsadded + " points added");
+            output.println(pointsadded + " points added");
             trajectoryList.add(ct);
         }
         else {
-            System.out.println("No trajectory added");
+            output.println("No trajectory added");
         }
     }
 
