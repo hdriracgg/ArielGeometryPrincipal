@@ -6,6 +6,7 @@ package com.cgg.arieltrajectoryeditor;
 
 import com.cgg.arielgeometry.model.io.UKOOAwriter;
 import com.cgg.arielgeometrycurrents.MetOceanReader;
+import com.sun.org.apache.xalan.internal.xsltc.runtime.BasisLibrary;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -89,6 +90,7 @@ public class WayPointEditingPanel extends JPanel implements MouseListener, Mouse
     JButton jb4;
     JButton jb5;
     JButton jb6;
+    JButton jb7;
     JTextField jtf1;
     Color defaultfg;
     Color defaultbg;
@@ -120,16 +122,19 @@ public class WayPointEditingPanel extends JPanel implements MouseListener, Mouse
         defaultbg = jb1.getBackground();
         defaultfg = jb1.getForeground();
         add(jb1);
-
-//        JButton jb2 = new JButton("Print");
-//        jb2.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                printpoints();
-//                repaint();
-//            }
-//        });
-//        add(jb2);
+        
+        // Add Target Zone
+        JButton jb2 = new JButton("Target");
+        jb2.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Add Target Zone
+                pointList = new ArrayList<>();
+                speedList = new ArrayList<>();
+                timeList = new ArrayList<>();
+            }
+        });
+        add(jb2);
 
         JButton jb3 = new JButton("Calibrate");
         jb3.addActionListener(new ActionListener() {
@@ -174,6 +179,15 @@ public class WayPointEditingPanel extends JPanel implements MouseListener, Mouse
             }
         });
         add(jb6);
+        
+        jb7 = new JButton("Auto Source");
+        jb7.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                writeAutoSourceTrajectories();
+            }
+        });
+        add(jb7);
 
         JLabel jl1 = new JLabel("Start Time = ");
         jl1.setOpaque(true);
@@ -604,7 +618,7 @@ public class WayPointEditingPanel extends JPanel implements MouseListener, Mouse
 
         // Run the interpolation
         MarinasPositionsCalculator mpc = new MarinasPositionsCalculator(realpointList,
-                speedList, nbNodePerGroup, nbNodeperLine, stepDuration, marinasDistance, starttime);
+                speedList, null, 0,0,nbNodePerGroup, nbNodeperLine, stepDuration, marinasDistance, starttime);
         List<Map<Integer, Node>> lmin = mpc.getMarinasPoints();
 
         // Output each Marina to a separate file in chosen directory
@@ -620,7 +634,66 @@ public class WayPointEditingPanel extends JPanel implements MouseListener, Mouse
         timeList = new ArrayList<>();
         System.out.println("Writing Marinas complete");
     }
+    
+    private void writeAutoSourceTrajectories(){
+        // Choose and create directory if needed
+        JFileChooser jfc = new JFileChooser("C:\\Users\\jgrimsdale\\Desktop");
+        jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        File od = null;
+        while (od == null) {
+            jfc.showSaveDialog(this);
+            od = jfc.getSelectedFile();
+            if (od == null) {
+                System.out.println("Ordinary file exists with this name");
+            }
+        }
+        if (!od.isDirectory()) {
+            System.out.println("Create directory");
+            try {
+                Files.createDirectory(od.toPath());
+            }
+            catch (IOException ex) {
+                Logger.getLogger(WayPointEditingPanel.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        String outputdirectory = od.getAbsolutePath();
+        System.out.println("Writing to directory " + outputdirectory);
+        
+        // Print waypoints to stdout
+        if (debug) {
+            printpoints();
+        }
+        
+        // Prepare list of real points
+        List<Point> realpointList = new ArrayList<>();
+        for (Point p : pointList) {
+            realpointList.add(screen2real(p));
+        }
+        
+        Float sourceSpeed = (float) 200;
+        int minSourceStepDistance = 500;
+        
+        if(marinapointList!=null && marinaspeedList!=null && realpointList!=null && realpointList.size()>=2){
+            // Run the interpolation
+            MarinasPositionsCalculator mpc = new MarinasPositionsCalculator(marinapointList,
+                marinaspeedList, realpointList,sourceSpeed ,minSourceStepDistance,1, 1, stepDuration, marinasDistance, starttime);
+            List<Node> sourcPositions = mpc.getSourcePositions();
 
+            // Output file in chosen directory
+            PrintStream ps = getps("AutoSource", 1, od);
+            for (Node n : sourcPositions) {
+                ps.printf("%.1f, %.1f, %.1f,,,,,,\n", (double) n.getTime(), (float) n.getCoodinates().x, (float) n.getCoodinates().y);
+            }
+            ps.close();
+
+            System.out.println("Writing Auto Source complete");
+        }else{
+            System.out.println("There is NO Marinas postions or Target Zone defined");
+        }
+        
+         
+        
+    }
     private void writesourcetrajectories() {
         // Choose and create directory if needed
         JFileChooser jfc = new JFileChooser("C:\\Users\\jgrimsdale\\Desktop");
@@ -660,7 +733,7 @@ public class WayPointEditingPanel extends JPanel implements MouseListener, Mouse
 
         // Run the interpolation
         MarinasPositionsCalculator mpc = new MarinasPositionsCalculator(realpointList,
-                speedList, 1, 1, stepDuration, marinasDistance, starttime);
+                speedList, null, 0,0,1, 1, stepDuration, marinasDistance, starttime);
         List<Map<Integer, Node>> lmin = mpc.getMarinasPoints();
 
         // Output each shot to a separate file in chosen directory
@@ -690,7 +763,7 @@ public class WayPointEditingPanel extends JPanel implements MouseListener, Mouse
 
         // Run the interpolation
         MarinasPositionsCalculator mpc = new MarinasPositionsCalculator(realpointList,
-                speedList, nbNodePerGroup, nbNodeperLine, stepDuration, marinasDistance, starttime);
+                speedList, null, 0, 0, nbNodePerGroup, nbNodeperLine, stepDuration, marinasDistance, starttime);
         List<Map<Integer, Node>> lmin = mpc.getMarinasPoints();
 
         // Print results
