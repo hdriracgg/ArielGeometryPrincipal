@@ -656,10 +656,11 @@ public class CurrentEditorPanel extends JPanel implements MouseListener, MouseMo
         Date startdate = mom.getmomDate(starttime * 1000);
         MetOceanModel.MORecord mor = mom.findclosest(startpoint.x, startpoint.y, startdate.getTime() * -1, defaultdepth);
         String buoy = mor.buoy;
-        System.out.println("Closest:\n" + mor);
-        System.out.printf("Distance of closest=%g\n", mor.getDistance(startpoint.x, startpoint.y));
-        System.out.printf("Time difference of closest=%d\n", mor.javadate.getTime() - startdate.getTime());
         long timefound = mor.javadate.getTime();
+        System.out.println("Closest buoy is:\n" + mor);
+        System.out.printf("Distance of closest=%g\n", mor.getDistance(startpoint.x, startpoint.y));
+        float hoursdifference = (timefound - startdate.getTime()) / (1000 * 3600);
+        System.out.printf("Time difference of closest=%f\n", hoursdifference);
 
         Map<Date, MetOceanModel.MORecord> recordmap = mom.getrecordsbybuoy(buoy);
         System.out.println("map size " + recordmap.size());
